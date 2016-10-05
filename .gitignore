@@ -1,3 +1,5 @@
 *.ipynb_checkpoints
 notebook/*/*.html
 data
+__pycache__
+cachedir
