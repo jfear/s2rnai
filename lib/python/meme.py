@@ -75,6 +75,7 @@ class memeTF(object):
     def __init__(self, id, name, alength, w, nsites, e, matrix, url):
         """ This is a simple parser for a meme transcription factor block. """
         self.id = id
+        self.fbgn = id if id.startswith('FBgn') else None
         self.name = name
         self.alength = int(alength)
         self.w = int(w)
