@@ -3,3 +3,7 @@ notebook/*/*.html
 data
 __pycache__
 cachedir
+output
+*slurm_logs
+*.snakemake
+bin/slurm-*

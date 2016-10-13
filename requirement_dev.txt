@@ -1,24 +1,25 @@
-anaconda-client           1.5.1                    py35_0  
-biopython                 1.67                np111py35_0  
-ipycache                  0.1.6.dev0                <pip>
-ipyparallel               5.2.0                    py35_0    conda-forge
-ipython                   5.1.0                    py35_0  
-ipywidgets                5.2.2                    py35_0    conda-forge
-jedi                      0.9.0                    py35_1  
-jinja2                    2.8                      py35_1  
-jsonschema                2.5.1                    py35_0  
-jupyter                   1.0.0                    py35_3  
-libpng                    1.6.17                        0    r
-nb_conda                  2.0.0                    py35_0  
-nbreport                  0.1.1b1                   <pip>
-neovim                    0.1.9                     <pip>
-notebook                  4.2.2                    py35_0  
-numpy                     1.11.1                   py35_0  
-pandas                    0.18.1              np111py35_0  
-scipy                     0.18.0              np111py35_0  
-setuptools                26.1.1                   py35_0  
-six                       1.10.0                   py35_0  
-watchdog                  0.8.3                    py35_0    bioconda
-watermark                 1.3.1                    py35_0    jfear
-yaml                      0.1.6                         0  
-zlib                      1.2.8                         1    r
+anaconda-client>=1.5.1
+biopython>=1.67
+ipyparallel>=5.2.0
+ipython>=5.1.0
+ipywidgets>=5.2.2
+jedi>=0.9.0
+jinja2>=2.8
+jsonschema>=2.5.1
+jupyter>=1.0.0
+libpng>=1.6.17
+nb_conda>=2.0.0
+notebook>=4.2.2
+numpy>=1.11.1
+pandas>=0.18.1
+scipy>=0.18.0
+setuptools>=26.1.1
+six>=1.10.0
+watchdog>=0.8.3
+watermark>=1.3.1
+yaml>=0.1.6
+zlib>=1.2.8
+# Need installed with pip
+#pip install git+https://github.com/jfear/ipycache.git
+#pip install git+https://github.com/jfear/nbreport.git
+#pip install neovim

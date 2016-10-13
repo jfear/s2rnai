@@ -1,0 +1,51 @@
+# ** snakemake ** #
+""" The motif workflow. 
+
+"""
+workdir: '.'
+shell.prefix('set -o pipefail; set -e; source activate s2rnai;')
+localrules: run
+
+conf = {
+    'fly_factor_survey': '../data/external/meme/motif_databases/FLY/fly_factor_survey.meme',
+    'on_the_fly': '../data/external/meme/motif_databases/FLY/OnTheFly_2014_Drosophila.meme',
+    'dm6': '/data/Oliverlab/references/genomes/Dmelanogaster/dm6/seq/dm6-noextra.fasta',
+    'dsim2': '/data/Oliverlab/data/FlyBase/FB2015_04/dsim.fa',
+    'dsec1': '/data/Oliverlab/data/FlyBase/FB2015_04/dsec.fa',
+    'dyak1': '/data/Oliverlab/data/FlyBase/FB2015_04/dyak.fa',
+    'dere1': '/data/Oliverlab/data/FlyBase/FB2015_04/dere.fa',
+    'dana1': '/data/Oliverlab/data/FlyBase/FB2015_04/dana.fa',
+    'dpse3': '/data/Oliverlab/data/FlyBase/FB2015_04/dpse.fa',
+    'dper1': '/data/Oliverlab/data/FlyBase/FB2015_04/dper.fa',
+    'dwil1': '/data/Oliverlab/data/FlyBase/FB2015_04/dwil.fa',
+    'dmoj1': '/data/Oliverlab/data/FlyBase/FB2015_04/dmoj.fa',
+    'dvir1': '/data/Oliverlab/data/FlyBase/FB2015_04/dvir.fa',
+    'dgri1': '/data/Oliverlab/data/FlyBase/FB2015_04/dgri.fa'
+}
+
+FILE_NAMES = ['../output/motif_alignments_fly_factor_survey_dm6.tsv', '../output/motif_alignments_on_the_fly_dm6.tsv',
+              '../output/motif_alignments_fly_factor_survey_dsim2.tsv', '../output/motif_alignments_on_the_fly_dsim2.tsv',
+              '../output/motif_alignments_fly_factor_survey_dsec1.tsv', '../output/motif_alignments_on_the_fly_dsec1.tsv',
+              '../output/motif_alignments_fly_factor_survey_dyak1.tsv', '../output/motif_alignments_on_the_fly_dyak1.tsv',
+              '../output/motif_alignments_fly_factor_survey_dere1.tsv', '../output/motif_alignments_on_the_fly_dere1.tsv',
+              '../output/motif_alignments_fly_factor_survey_dana1.tsv', '../output/motif_alignments_on_the_fly_dana1.tsv',
+              '../output/motif_alignments_fly_factor_survey_dpse3.tsv', '../output/motif_alignments_on_the_fly_dpse3.tsv',
+              '../output/motif_alignments_fly_factor_survey_dper1.tsv', '../output/motif_alignments_on_the_fly_dper1.tsv',
+              '../output/motif_alignments_fly_factor_survey_dwil1.tsv', '../output/motif_alignments_on_the_fly_dwil1.tsv',
+              '../output/motif_alignments_fly_factor_survey_dmoj1.tsv', '../output/motif_alignments_on_the_fly_dmoj1.tsv',
+              '../output/motif_alignments_fly_factor_survey_dvir1.tsv', '../output/motif_alignments_on_the_fly_dvir1.tsv',
+              '../output/motif_alignments_fly_factor_survey_dgri1.tsv', '../output/motif_alignments_on_the_fly_dgri1.tsv']
+
+
+rule run:
+    input: list(set(FILE_NAMES))
+
+def _input_fimo(wildcards):
+    return conf[wildcards.meme], conf[wildcards.ref]
+
+rule fimo:
+    input: _input_fimo
+    output: '../output/motif_alignments_{meme}_{ref}.tsv'
+    shell: """
+    fimo --qv-thresh --thresh 0.05 {input[0]} {input[1]}
+    """

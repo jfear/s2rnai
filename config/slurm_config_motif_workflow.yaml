@@ -1,0 +1,6 @@
+__default__:
+    mem: '8g'
+    time: '24:00:00'
+    gres: "lscratch:0"
+    partition: 'niddk,norm,b1'
+    threads: 2
