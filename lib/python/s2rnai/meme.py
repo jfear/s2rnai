@@ -99,7 +99,7 @@ class memeTF(object):
 
     @id.setter
     def id(self, value):
-        
+
         if len(value.split('_')) > 1:
             s = value.split('_')
             self._id = s[0]
@@ -111,7 +111,7 @@ class memeTF(object):
         else:
             self._id = value
             self.count = 0
-        
+
     @property
     def matrix(self):
         return self._matrix
