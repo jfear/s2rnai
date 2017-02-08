@@ -1,6 +1,10 @@
 __default__:
-    mem: '8g'
-    time: '24:00:00'
-    gres: "lscratch:0"
-    partition: 'niddk,norm,b1'
-    threads: 2
+  mem: '8g'
+  time: '24:00:00'
+  gres: "lscratch:0"
+  partition: 'niddk,norm'
+  threads: 2
+
+fimo:
+  time: '72:00:00'
+  gres: "lscratch:20"
