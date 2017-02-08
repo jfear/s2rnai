@@ -1,14 +1,36 @@
 # ** snakemake ** #
-""" The motif workflow. 
+"""The motif workflow."""
+import os
+import sys
+from tempfile import NamedTemporaryFile, mkdtemp
+from urllib.request import urlretrieve, urlopen
+import tarfile
 
-"""
+import pandas as pd
+
+from lcdblib.snakemake import helpers
+from lcdblib.utils import utils
+
+sys.path.insert(0, '../lib/python')
+from s2rnai import meme
+
+try:
+    TMPDIR = os.path.join('/lscratch', os.getenv('SLURM_JOBID'))
+    assert os.path.exists(TMPDIR)
+except:
+    try:
+        TMPDIR = os.getenv('TMPDIR')
+        assert os.path.exists(TMPDIR)
+    except:
+        from tempfile import mkdtemp
+        TMPDIR = mkdtemp(dir='.snakemake/')
+        print('Temporary storage is at: {}'.format(TMPDIR))
+
+shell.prefix("set -euo pipefail; export TMPDIR={};".format(TMPDIR))
+
 workdir: '.'
-shell.prefix('set -o pipefail; set -e; source activate s2rnai;')
-localrules: run
 
 conf = {
-    'fly_factor_survey': '../data/external/meme/motif_databases/FLY/fly_factor_survey.meme',
-    'on_the_fly': '../data/external/meme/motif_databases/FLY/OnTheFly_2014_Drosophila.meme',
     'dm6': '/data/Oliverlab/references/genomes/Dmelanogaster/dm6/seq/dm6-noextra.fasta',
     'dsim2': '/data/Oliverlab/data/FlyBase/FB2015_04/dsim.fa',
     'dsec1': '/data/Oliverlab/data/FlyBase/FB2015_04/dsec.fa',
@@ -37,15 +59,114 @@ FILE_NAMES = ['../output/motif_alignments_fly_factor_survey_dm6.tsv', '../output
               '../output/motif_alignments_fly_factor_survey_dgri1.tsv', '../output/motif_alignments_on_the_fly_dgri1.tsv']
 
 
-rule run:
-    input: list(set(FILE_NAMES))
+################################################################################
+# Set up file naming patterns
+################################################################################
+patterns = {
+    'meme': {
+        'onTheFly': '../data/external/meme/OnTheFly_2014_Drosophila.meme',
+        'flyFactor': '../data/external/meme/fly_factor_survey.meme',
+        'flyReg': '../data/external/meme/flyreg.v2.meme',
+        'dmmpmm2009': '../data/external/meme/dmmpmm2009.meme',
+        'idmmpm2009': '../data/external/meme/idmmpmm2009.meme',
+        },
+    'onTheFlyMap': '../output/onTheFlyMap.tsv',
+    'fimo': {
+        'xml': '../output/fimo/motif_alignments_{meme}_{ref}.xml',
+        'html': '../output/fimo/motif_alignments_{meme}_{ref}.html',
+        'txt': '../output/fimo/motif_alignments_{meme}_{ref}.txt',
+        'gff': '../output/fimo/motif_alignments_{meme}_{ref}.gff',
+        'log': '../output/fimo/motif_alignments_{meme}_{ref}.log',
+        },
+    'dm6': '/data/LCDB/lcdb-references/dm6/r6-11/fasta/dm6_r6-11.fasta',
+}
 
-def _input_fimo(wildcards):
-    return conf[wildcards.meme], conf[wildcards.ref]
+fill = dict(meme=['flyFactor', 'onTheFly'], ref='dm6')
+targets = helpers.fill_patterns(patterns, fill)
+
+rule targets:
+    input: utils.flatten(targets)
+
+rule download_meme:
+    output: utils.flatten(patterns['meme'])
+    params: url='http://meme-suite.org/meme-software/Databases/motifs/motif_databases.12.15.tgz'
+    run:
+        from Bio import motifs
+        tmp = NamedTemporaryFile(dir=TMPDIR)
+
+        # Download tar
+        urlretrieve(url=params.url, filename=tmp.name)
+
+        # Unpack tar to TMPDIR
+        def fly(members):
+            for info in members:
+                if 'FLY' in info.name:
+                    yield info
+
+        with tarfile.open(tmp.name) as tar:
+            tar.extractall(path=TMPDIR, members=fly(tar))
+
+        # Iterate over outputs and move file to right spot
+        for fn in output:
+            name = os.path.basename(fn)
+            shell('mv $TMPDIR/motif_databases/FLY/{0} {1}'.format(name, fn))
+
+        # Remove tar file
+        tmp.close()
+
+
+rule map_otf_fbgn:
+    input: targets['meme']['onTheFly']
+    output: patterns['onTheFlyMap']
+    run:
+        onTheFlyTFS = meme.memeFile(input[0])
+
+        results = []
+        for key, values in onTheFlyTFS.items():
+            for value in values:
+                # grab link to protein page from url provided
+                with urlopen(value.url) as fh:
+                    page = fh.read().decode('UTF-8')
+                    name = re.findall(r'protein_entry.php\?protein_ID=(.*?)\'', page)[0]
+                    ID = re.findall(r'ID: (OTF\d+\.\d+)', page)[0]
+                URL = 'https://bhapp.c2b2.columbia.edu/OnTheFly/cgi-bin/protein_entry.php?protein_ID={0}'
+                try:
+                    with urlopen(URL.format(name)) as fh:
+                        fbgn = re.findall(r'FBgn\d+', fh.read().decode('utf-8'))[0]
+                    results.append((key, ID, value.name, fbgn))
+                except:
+                    pass
+        df = pd.DataFrame(results, columns=['motif_id', 'name', 'target_protein', 'FBgn'])
+        df.to_csv(output[0], index=False, sep='\t')
+
+def _fimo(wildcards):
+    return [patterns['meme'][wildcards.meme], patterns[wildcards.ref]]
 
 rule fimo:
-    input: _input_fimo
-    output: '../output/motif_alignments_{meme}_{ref}.tsv'
-    shell: """
-    fimo --qv-thresh --thresh 0.05 {input[0]} {input[1]}
-    """
+    input: _fimo
+    output:
+        xml = patterns['fimo']['xml'],
+        html = patterns['fimo']['html'],
+        txt = patterns['fimo']['txt'],
+        gff = patterns['fimo']['gff'],
+        log = patterns['fimo']['log']
+    run:
+        fimoTMP = mkdtemp()
+
+        shell(
+            'fimo '
+            '--qv-thresh '
+            '--thresh 0.05 '
+            '--oc {fimoTMP} '
+            '{input[0]} '
+            '{input[1]} '
+            '2>{output.log}'
+            )
+
+        shell(
+            'mv {fimoTMP}/fimo.xml {output.xml} '
+            '&& mv {fimoTMP}/fimo.html {output.html} '
+            '&& mv {fimoTMP}/fimo.txt {output.txt} '
+            '&& mv {fimoTMP}/fimo.gff {output.gff} '
+            '&& rm -rf {fimoTMP} '
+            )
