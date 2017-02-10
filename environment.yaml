@@ -11,6 +11,7 @@ dependencies:
 - bioconda::argh=0.26.2
 - bioconda::biopython=1.68
 - bioconda::expat=2.1.0
+- bioconda::gffutils=0.8.7.1
 - bioconda::jpeg=9b
 - bioconda::libxml2=2.9.3
 - bioconda::meme=4.11.1
