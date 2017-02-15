@@ -10,7 +10,7 @@ CacheMagics.cachedir = '../cachedir'
 
 # Trun on the water mark
 %reload_ext watermark
-%watermark -u -d -v
+%watermark -u -d -v -g
 
 # Load ipycache extension
 %reload_ext ipycache
