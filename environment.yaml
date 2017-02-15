@@ -9,6 +9,7 @@ channels: !!python/tuple
 dependencies:
 - anaconda-client=1.6.0
 - bioconda::argh=0.26.2
+- bioconda::bedtools=2.26.0
 - bioconda::biopython=1.68
 - bioconda::expat=2.1.0
 - bioconda::gffutils=0.8.7.1
