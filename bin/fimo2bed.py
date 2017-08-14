@@ -8,7 +8,7 @@ def arguments():
     parser = argparse.ArgumentParser(description='takes file ??')
     parser.add_argument("-i", "--input", dest="filename", action='store', required=True,
                         help='input file should be fimo')
-    #parser.add_argument("-o", "--output", dest="new", action='store',required=True, help='bed')
+    parser.add_argument("-o", "--output", dest="new", action='store',required=True, help='bed')
 
     args = parser.parse_args()
     return args
@@ -16,7 +16,7 @@ def arguments():
 def main():
     #import command line arguments
     args= arguments()
-    with open(args.filename + '_.bed', 'w+') as outfile:
+    with open(args.new, 'w+') as outfile:
         with open(args.filename) as f:
             for line in f:
                 if not line.startswith("#"):
