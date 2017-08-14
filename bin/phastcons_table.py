@@ -23,7 +23,7 @@ def main():
     with open(args.filename) as f:
         for line in f:
             pattern = re.compile(
-                r'\w*\t(\w*)\t(\w*)\t(FBgn\w*)\t(\S*)\t.*(chr\w*)\tFlyBase\sgene\t\w*\t\w*.*ID=(\w*);Name=(\w*).*\t(\S*)\t\w*')
+                r'\w*\t(\w*)\t(\w*)\t(\S*)\t(\S*)\t.*(chr\w*)\tFlyBase\sgene\t\w*\t\w*.*ID=(\w*);Name=(\w*).*\t(\S*)\t\w*')
             match = pattern.match(line)
             TF = match.group(3)
             qval = float(match.group(4))
