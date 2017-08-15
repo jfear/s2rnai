@@ -30,10 +30,6 @@ shell.prefix("set -euo pipefail; export TMPDIR={};".format(TMPDIR))
 
 workdir: '.'
 
-conf = {
-    'dm6': '/data/Oliverlab/references/genomes/Dmelanogaster/dm6/seq/dm6-noextra.fasta',
-}
-
 ################################################################################
 # Set up file naming patterns
 ################################################################################
