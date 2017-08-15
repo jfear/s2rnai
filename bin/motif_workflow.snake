@@ -39,7 +39,7 @@ patterns = {
         'flyFactor': '../data/external/meme/fly_factor_survey.meme',
         'flyReg': '../data/external/meme/flyreg.v2.meme',
         'dmmpmm2009': '../data/external/meme/dmmpmm2009.meme',
-        'idmmpm2009': '../data/external/meme/idmmpmm2009.meme',
+        'idmmpmm2009': '../data/external/meme/idmmpmm2009.meme',
         },
     'onTheFlyMap': '../output/onTheFlyMap.tsv',
     'fimo': {
@@ -49,10 +49,10 @@ patterns = {
         'gff': '../output/fimo/motif_alignments_{meme}_{ref}.gff',
         'log': '../output/fimo/motif_alignments_{meme}_{ref}.log',
         },
-    'dm6': '/data/LCDB/lcdb-references/dm6/r6-11/fasta/dm6_r6-11.fasta',
+    'dm6': '/data/LCDB/lcdb-references/dmel/r6-11/fasta/dmel_r6-11.fasta',
 }
 
-fill = dict(meme=['flyFactor', 'onTheFly', 'flyreg', 'dmmpmm2009', 'idmmpmm2009'], ref='dm6')
+fill = dict(meme=['flyFactor', 'onTheFly', 'flyReg', 'dmmpmm2009', 'idmmpmm2009'], ref='dm6')
 targets = helpers.fill_patterns(patterns, fill)
 
 rule targets:
