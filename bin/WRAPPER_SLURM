@@ -9,12 +9,7 @@ source activate s2rnai
 
 SNAKEFILE=$1
 EXTRA=$2
-
-if [ -n "$3" ]; then
-    CONFIG=$3
-else
-    CONFIG=$HOME/devel/snakemakelib-oliver/data/slurm_cluster_config.yaml
-fi
+CONFIG=$3
 
 LOGS=../output/logs
 if [[ ! -e $LOGS ]]; then mkdir -p $LOGS; fi
