@@ -49,7 +49,7 @@ patterns = {
         'gff': '../output/fimo/motif_alignments_{meme}_{ref}.gff',
         'log': '../output/fimo/motif_alignments_{meme}_{ref}.log',
         },
-    'dm6': '/data/LCDB/lcdb-references/dmel/r6-11/fasta/dmel_r6-11.fasta',
+    'dm6': '../references/slopped_genes.fasta',
 }
 
 fill = dict(meme=['flyFactor', 'onTheFly', 'flyReg', 'dmmpmm2009', 'idmmpmm2009'], ref='dm6')
