@@ -19,4 +19,9 @@ CacheMagics.cachedir = '../cachedir'
 
 # Add project library to path
 import sys
+sys.path.insert(0, '../../lcdb-wf/lib')
 sys.path.insert(0, '../../lib/python')
+
+import yaml
+with open('../../config/config.yaml') as fh:
+    config = yaml.load(fh)
