@@ -13,20 +13,36 @@ TSV with sample information called: ../config/sample_table.tsv
 oname = '../config/sample_table.tsv'
 GSE = "GSE81221"
 CONFIG = '../config/config.yml'
+EMAIL = 'justin.fear@nih.gov'
 
 import os
 import sys
 import re
 from tempfile import TemporaryDirectory
 import yaml
+from xml.etree import ElementTree
 
 import pandas as pd
 import numpy as np
+from Bio import Entrez
+Entrez.email = EMAIL
 
 import GEOparse
 
 sys.path.insert(0, '../lib/python')
 from s2rnai.logger import logger
+
+def srr_iter(srx):
+    """Create generator to return SRR given an SRX."""
+
+    res = Entrez.efetch(db='sra', id=srx)
+    xml = res.read()
+    root = ElementTree.fromstring(xml)
+    for run in root.iter('RUN'):
+        yield run.get('accession')
+
+    res.close()
+
 
 # Import config set up references
 logger.info('Loading config: {}'.format(CONFIG))
@@ -88,12 +104,16 @@ for gsm, dat in gse.gsms.items():
     for x in dat.metadata['relation']:
         k, v = re.match(r'(\w+):.*[\/=](\w+\d+)$', x).groups()
         attrs[k] = v
-    attributes.append(attrs)
+
+    # Get SRRs
+    for srr in srr_iter(attrs['SRA']):
+        attrs['sample_id'] = srr
+        attributes.append(attrs)
 
 df = pd.DataFrame(attributes)
 
-df.rename(columns={'SRA': 'sample_id'}, inplace=True)
-df.set_index('sample_id', inplace=True)
+df.rename(columns={'SRA': 'SRX'}, inplace=True)
+df.set_index(['sample_id', 'SRX'], inplace=True)
 
 ## Grab useful columns and reorder
 cols = [
@@ -130,7 +150,7 @@ cleaned = cleaned.reset_index().merge(drsc, left_on='drsc', right_on='drsc')
 
 ## Reorder columns
 cols = [
-    'sample_id', 'BioSample', 'GEO',  'drsc',  'target_FBgn',  'target_symbol',
+    'sample_id', 'SRX', 'BioSample', 'GEO',  'drsc',  'target_FBgn',  'target_symbol',
     'drsc_rep', 'rep',  'plate_id',  'well_id', 'plate_row',  'plate_column',
 ]
 
