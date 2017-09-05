@@ -1,4 +1,6 @@
 # Load useful extensions
+import os
+import sys
 
 # Activate the autoreload extension for easy reloading of external packages
 %reload_ext autoreload
@@ -18,10 +20,14 @@ from ipycache import CacheMagics
 CacheMagics.cachedir = '../cachedir'
 
 # Add project library to path
-import sys
 sys.path.insert(0, '../../lcdb-wf/lib')
 sys.path.insert(0, '../../lib/python')
 
+# Set up references
 import yaml
 with open('../../config/config.yml') as fh:
     config = yaml.load(fh)
+
+assembly = config['assembly']
+tag = config['aligner']['tag']
+REF = os.path.join(os.environ['REFERENCES_DIR'], assembly, tag)
