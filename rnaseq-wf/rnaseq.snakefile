@@ -534,7 +534,7 @@ rule rnaseq_rmarkdown:
     """
     input:
         featurecounts=targets['featurecounts'],
-        rmd='../lcdb-wf/downstream/rnaseq.Rmd',
+        rmd='downstream/rnaseq.Rmd',
         sampletable=config['sampletable']
     output:
         'downstream/rnaseq.html'
