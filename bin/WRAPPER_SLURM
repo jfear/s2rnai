@@ -6,8 +6,6 @@
 #SBATCH --mem=700
 set -e -o pipefail -u
 
-source activate s2rnai
-
 CLUSTERCONFIG=../config/slurm_config.yaml
 CONFIG=../config/config.yml
 
@@ -25,7 +23,8 @@ else
     EXTRA=targets
 fi
 
-(time snakemake \
+(source activate s2rnai; \
+    time snakemake \
     -p \
     -s $SNAKEFILE \
     --directory $WORKDIR \
