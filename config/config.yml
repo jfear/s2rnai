@@ -1,7 +1,7 @@
 # sampletable: TSV file defining sample metadata.
 #
 # First column must have header name "samplename".
-sampletable: 'config/sampletable.tsv'
+sampletable: '../config/sample_table_test.tsv'
 
 # sample_dir: directory in which each sample is expected to have its own
 # directory and fastq file[s]. If `sampletable` lists a sample with samplename
@@ -30,6 +30,9 @@ gtf:
     tag: "r6-16"
 
 kallisto:
+    tag: "r6-16_transcriptome"
+
+salmon:
     tag: "r6-16_transcriptome"
 
 
@@ -105,6 +108,7 @@ references:
         url: 'ftp://ftp.flybase.net/genomes/Drosophila_melanogaster/dmel_r6.11_FB2016_03/fasta/dmel-all-transcript-r6.11.fasta.gz'
         indexes:
           - 'kallisto'
+          - 'salmon'
 
     r6-11_and_ercc:
       gtf:
@@ -172,6 +176,7 @@ references:
         url: 'ftp://ftp.flybase.net/genomes/Drosophila_melanogaster/dmel_r6.16_FB2017_03/fasta/dmel-all-transcript-r6.16.fasta.gz'
         indexes:
           - 'kallisto'
+          - 'salmon'
 
     r6-16_and_ercc:
       gtf:
@@ -216,6 +221,7 @@ references:
         url: 'ftp://ftp.sanger.ac.uk/pub/gencode/Gencode_human/release_25/gencode.v25.transcripts.fa.gz'
         indexes:
           - 'kallisto'
+          - 'salmon'
 
     gencode-v19:
       fasta:
@@ -235,6 +241,7 @@ references:
         postprocess: "lib.common.cat"
         indexes:
           - 'kallisto'
+          - 'salmon'
 
     rRNA:
       fasta:
@@ -266,6 +273,7 @@ references:
         url: 'ftp://ftp.sanger.ac.uk/pub/gencode/Gencode_mouse/release_M12/gencode.vM12.transcripts.fa.gz'
         indexes:
           - 'kallisto'
+          - 'salmon'
   ecoli:
     default:
       fasta:
@@ -295,6 +303,7 @@ references:
         postprocess: "lib.common.cat"
         indexes:
             - "kallisto"
+            - 'salmon'
 
     ensembl_2.7:
       fasta:

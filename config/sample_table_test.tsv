@@ -1,0 +1,3 @@
+sample_id	SRX	BioSample	GEO	drsc	target_FBgn	target_symbol	drsc_rep	rep	plate_id	well_id	plate_row	plate_column
+SRR3486891	SRX1748887	SAMN04959321	GSM2145154	DRSC07681	FBgn0003396	shn	2	1	1	E8	E	8
+SRR3486986	SRX1748983	SAMN04959673	GSM2145249	DRSC07681	FBgn0003396	shn	2	2	1	E8	E	8
