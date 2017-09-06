@@ -206,6 +206,7 @@ references:
         indexes:
           - 'kallisto'
           - 'salmon'
+
   ecoli:
     default:
       fasta:
