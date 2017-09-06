@@ -538,4 +538,4 @@ rule rnaseq_rmarkdown:
         'Rscript -e '
         '''"rmarkdown::render('{input.rmd}', 'knitrBootstrap::bootstrap_document')"'''
 
-# vim: ft=python
+# vim: ft=snakemake.python
