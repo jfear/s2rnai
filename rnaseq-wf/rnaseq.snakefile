@@ -257,7 +257,13 @@ rule fastq_screen:
         fastq=rules.cutadapt.output.fastq,
         dm6=refdict[assembly][config['aligner']['tag']]['bowtie2'],
         rRNA=refdict[assembly][config['rrna']['tag']]['bowtie2'],
-        phix=refdict['phix']['default']['bowtie2']
+        phix=refdict['phix']['default']['bowtie2'],
+        ercc=refdict['ercc']['srm2374']['bowtie2'],
+        human=refdict['human']['gencode-v25']['bowtie2'],
+        mouse=refdict['mouse']['gencode_m12']['bowtie2'],
+        yeast=refdict['sacCer3']['default']['bowtie2'],
+        wolbachia=refdict['wolbachia']['default']['bowtie2'],
+        ecoli=refdict['ecoli']['default']['bowtie2'],
     output:
         txt=patterns['fastq_screen']
     log:
