@@ -140,7 +140,7 @@ if 'orig_filename' in sampletable.columns:
 
 rule fastq:
     output:
-        fastq=patterns['fastq']
+        fastq=temp(patterns['fastq'])
     shell: """
     odir=`mktemp -d -p $TMPDIR` && \
     fastq-dump --split-spot --split-files --minReadLen 20 --gzip -O $odir {wildcards.sample} && \
