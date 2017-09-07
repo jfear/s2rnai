@@ -1,10 +1,10 @@
 #!/bin/bash
 #SBATCH --job-name="s2RNA_snake"
-#SBATCH --partition="niddk,norm"
+#SBATCH --partition="norm"
 #SBATCH --cpus-per-task=1
-#SBATCH --time=48:00:00
-#SBATCH --mem=700
-set -e -o pipefail -u
+#SBATCH --time=24:00:00
+#SBATCH --mem=2g
+set -e -o pipefail
 
 CLUSTERCONFIG=../config/slurm_config.yaml
 CONFIG=../config/config.yml
