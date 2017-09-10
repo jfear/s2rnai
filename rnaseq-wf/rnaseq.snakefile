@@ -283,6 +283,8 @@ rule featurecounts:
     output:
         counts=patterns['featurecounts']
     threads: 4
+    params:
+        extra='-s 2'
     log:
         patterns['featurecounts'] + '.log'
     wrapper:
