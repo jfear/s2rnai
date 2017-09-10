@@ -191,6 +191,7 @@ rule hisat2:
     log:
         patterns['bam'] + '.log'
     params:
+        hisat2_extra='--max-intronlen 300000'
         samtools_view_extra='-F 0x04'
     threads: 6
     wrapper:
