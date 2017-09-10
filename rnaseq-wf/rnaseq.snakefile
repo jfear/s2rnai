@@ -282,6 +282,7 @@ rule featurecounts:
         bam=rules.hisat2.output
     output:
         counts=patterns['featurecounts']
+    threads: 4
     log:
         patterns['featurecounts'] + '.log'
     wrapper:
