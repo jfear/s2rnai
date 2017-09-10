@@ -191,7 +191,7 @@ rule hisat2:
     log:
         patterns['bam'] + '.log'
     params:
-        hisat2_extra='--max-intronlen 300000'
+        hisat2_extra='--max-intronlen 300000 --rna-strandedness R'
         samtools_view_extra='-F 0x04'
     threads: 6
     wrapper:
