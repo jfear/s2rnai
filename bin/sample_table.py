@@ -10,7 +10,7 @@ Returns
 -------
 TSV with sample information called: ../config/sample_table.tsv
 """
-oname = '../config/sample_table.tsv'
+oname = '../config/sampletable.tsv'
 GSE = "GSE81221"
 CONFIG = '../config/config.yml'
 EMAIL = 'justin.fear@nih.gov'
@@ -107,13 +107,13 @@ for gsm, dat in gse.gsms.items():
 
     # Get SRRs
     for srr in srr_iter(attrs['SRA']):
-        attrs['sample_id'] = srr
+        attrs['samplename'] = srr
         attributes.append(attrs)
 
 df = pd.DataFrame(attributes)
 
 df.rename(columns={'SRA': 'SRX'}, inplace=True)
-df.set_index(['sample_id', 'SRX'], inplace=True)
+df.set_index(['samplename', 'SRX'], inplace=True)
 
 ## Grab useful columns and reorder
 cols = [
@@ -150,7 +150,7 @@ cleaned = cleaned.reset_index().merge(drsc, left_on='drsc', right_on='drsc')
 
 ## Reorder columns
 cols = [
-    'sample_id', 'SRX', 'BioSample', 'GEO',  'drsc',  'target_FBgn',  'target_symbol',
+    'samplename', 'SRX', 'BioSample', 'GEO',  'drsc',  'target_FBgn',  'target_symbol',
     'drsc_rep', 'rep',  'plate_id',  'well_id', 'plate_row',  'plate_column',
 ]
 

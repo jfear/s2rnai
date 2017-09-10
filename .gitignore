@@ -7,5 +7,6 @@ cachedir
 output
 *slurm_logs
 *.snakemake
+*.log
 bin/slurm-*
-references/
+references
