@@ -138,6 +138,7 @@ if 'orig_filename' in sampletable.columns:
     rule symlink_targets:
         input: targets['fastq']
 
+
 rule fastq:
     output:
         fastq=temp(patterns['fastq'])
@@ -150,6 +151,7 @@ rule fastq:
         mv $odir/{wildcards.sample}_2.fastq.gz ${{{output.fastq}/_1/_2}}
     fi
     """
+
 
 rule cutadapt:
     """
@@ -214,6 +216,7 @@ rule rRNA:
     threads: 6
     wrapper:
         wrapper_for('bowtie2/align')
+
 
 rule fastq_count:
     """
@@ -342,6 +345,7 @@ rule rrna_libsizes_table:
         with open(output.json, 'w') as fout:
             yaml.dump(y, fout, default_flow_style=False)
 
+
 rule libsizes_table:
     """
     Aggregate fastq and bam counts in to a single table
@@ -382,8 +386,6 @@ rule libsizes_table:
         }
         with open(output.json, 'w') as fout:
             yaml.dump(y, fout, default_flow_style=False)
-
-
 
 
 rule multiqc:
