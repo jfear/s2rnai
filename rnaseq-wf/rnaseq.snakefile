@@ -47,6 +47,7 @@ patterns = {
     },
     'fastq_screen': '{sample_dir}/{sample}/{sample}.cutadapt.screen.txt',
     'featurecounts': '{sample_dir}/{sample}/{sample}.cutadapt.bam.featurecounts.txt',
+    'adjustedcount': '{sample_dir}/{sample}/{sample}.cutadapt.bam.adjustedcounts.txt',
     'libsizes_table': '{agg_dir}/libsizes_table.tsv',
     'libsizes_yaml': '{agg_dir}/libsizes_table_mqc.yaml',
     'rrna_percentages_table': '{agg_dir}/rrna_percentages_table.tsv',
@@ -114,6 +115,7 @@ rule targets:
             [targets['rrna_percentages_table']] +
             [targets['multiqc']] +
             utils.flatten(targets['featurecounts']) +
+            utils.flatten(targets['adjustedcounts']) +
             utils.flatten(targets['rrna']) +
             utils.flatten(targets['markduplicates']) +
             utils.flatten(targets['salmon']) +
@@ -293,6 +295,23 @@ rule featurecounts:
         patterns['featurecounts'] + '.log'
     wrapper:
         wrapper_for('featurecounts')
+
+
+rule adjusted_counts:
+    """
+    Count reads with and without the DRSC reagent region.
+    """
+    input:
+        bam=rules.hisat2.output
+    output:
+        counts=patterns['adjustedcounts']
+    log:
+        patterns['adjustedcounts'] + '.log'
+    shell:
+        """
+        source activate s2rnai && \
+        python ../bin/drsc_adjust_count.py {wildcards.samplename} {input.bam} > {output.counts}
+        """
 
 
 rule rrna_libsizes_table:
