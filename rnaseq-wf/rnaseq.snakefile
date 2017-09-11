@@ -47,7 +47,7 @@ patterns = {
     },
     'fastq_screen': '{sample_dir}/{sample}/{sample}.cutadapt.screen.txt',
     'featurecounts': '{sample_dir}/{sample}/{sample}.cutadapt.bam.featurecounts.txt',
-    'adjustedcount': '{sample_dir}/{sample}/{sample}.cutadapt.bam.adjustedcounts.txt',
+    'adjustedcounts': '{sample_dir}/{sample}/{sample}.cutadapt.bam.adjustedcounts.txt',
     'libsizes_table': '{agg_dir}/libsizes_table.tsv',
     'libsizes_yaml': '{agg_dir}/libsizes_table_mqc.yaml',
     'rrna_percentages_table': '{agg_dir}/rrna_percentages_table.tsv',
@@ -297,7 +297,7 @@ rule featurecounts:
         wrapper_for('featurecounts')
 
 
-rule adjusted_counts:
+rule adjustedcounts:
     """
     Count reads with and without the DRSC reagent region.
     """
