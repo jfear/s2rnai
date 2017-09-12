@@ -10,26 +10,51 @@ import sys
 from textwrap import dedent
 import collections
 import yaml
+import argparse
+from argparse import RawDescriptionHelpFormatter as Raw
 
 import pandas as pd
 
 import pybedtools
 import HTSeq
 
-# Grab command line arguments
-if len(sys.argv) < 3:
-    print("You must provide two command line arguments in the form:\n"
-          "drsc_adjust_count.py <SRR> <BAM>\n\n")
-    sys.exit()
 
-_, SRR, BAM = sys.argv
+def arguments():
+    """Pulls in command line arguments."""
 
-# Create an output file to store reads
-FQ = BAM + '.drsc_reads.fq'
+    DESCRIPTION = dedent("""\
+    We have found that DRSC RNAi reagents were disproportionally showing up in
+    the RNA-seq results. To figure out how big of a problem this is we count
+    the number of reads that align to the target gene, the number of reads that
+    align to the target gene after removing the reagent region, and the number
+    of reads that align to the reagent region. This script also outputs a list
+    of reads that align to the reagent in case we want to do some more
+    downstream analysis.
+    """)
 
-# import config
-with open('../config/config.yml') as fh:
-    CONFIG = yaml.load(fh)
+    parser = argparse.ArgumentParser(description=DESCRIPTION, formatter_class=Raw)
+
+    parser.add_argument("--SRR", dest="srr", action='store', required=True,
+                        help="Give the SRR identifier.")
+
+    parser.add_argument("--BAM", dest="bam", action='store', required=True,
+                        help="Path to the BAM file to analyze")
+
+    parser.add_argument("--counts", dest="counts", action='store', required=True,
+                        help="The output counts table.")
+
+    parser.add_argument("--reads", dest="reads", action='store', required=True,
+                        help="The output FASTQ for reads that align to the reagent.")
+
+    parser.add_argument("--config", dest="config", action='store', required=False, default='../config/config.yml',
+                        help="lcdb-wf styled config.")
+
+    parser.add_argument("--sampletable", dest="stable", action='store', required=False, default='../config/sampletable.tsv',
+                        help="lcdb-wf styled sampletable.")
+
+    args = parser.parse_args()
+
+    return args
 
 
 def get_drsc_bed(drsc):
@@ -48,8 +73,13 @@ def get_drsc_bed(drsc):
 
 def get_gtf_name():
     """Return filename of GTF."""
-    assembly = CONFIG['assembly']
-    tag = CONFIG['aligner']['tag']
+    # import config
+    global args
+    with open(args.config) as fh:
+        config = yaml.load(fh)
+
+    assembly = config['assembly']
+    tag = config['aligner']['tag']
     return os.path.join(os.environ['REFERENCES_DIR'],
                         assembly, tag, 'gtf',
                         '{assembly}_{tag}.gtf'.format( assembly=assembly, tag=tag))
@@ -129,7 +159,7 @@ def make_fq(read):
     return dedent(""">{read_id}
                 {read_seq}
                 +
-                {read_qual}""".format(read_id=read.name, read_seq=read.seq.decode('UTF-8'), read_qual=read.qualstr.decode('UTF-8'))
+                {read_qual}""".format(read_id=read.name, read_seq=read.seq.decode('UTF-8'), read_qual=read.qualstr.decode('UTF-8')))
 
 
 def count_algn(gene, sub, drsc):
@@ -140,6 +170,7 @@ def count_algn(gene, sub, drsc):
     dict:
         A dicitonary with counts.
     """
+    global args
     counter = {
         'gene_count': 0,
         'sub_count': 0,
@@ -147,7 +178,7 @@ def count_algn(gene, sub, drsc):
     }
     reads = []
 
-    fh = HTSeq.BAM_Reader(BAM)
+    fh = HTSeq.BAM_Reader(args.bam)
     for algn in fh:
         # skip reads that are on different chromosomes
         if algn.iv.chrom not in list(gene.chrom_vectors.keys()):
@@ -204,9 +235,14 @@ def get_bed_len(bed):
 
 
 def main():
+    # Import commandline arguments.
+    global args
+    args = arguments()
+
     # import sample table information
-    stable = pd.read_table('../config/sampletable.tsv')
-    mask = stable.samplename == SRR
+    stable = pd.read_table(args.stable)
+    srr = args.srr.strip()
+    mask = stable.samplename == srr
     drsc = stable[mask].drsc.iloc[0]
     fbgn = stable[mask].target_FBgn.iloc[0]
 
@@ -228,7 +264,7 @@ def main():
     counts, reads = count_algn(gene_interval, gene_sub_interval, drsc_interval)
 
     # output list of reads that aligned to DRSC
-    with open(FQ, 'w') as fh:
+    with open(args.reads, 'w') as fh:
         fh.write('\n'.join(reads))
 
     # Add metadata
@@ -241,11 +277,11 @@ def main():
     counts['drsc_length'] = get_bed_len(drsc_bed)
 
     # Make DataFrame
-    df = pd.DataFrame(counts, index=[SRR])
+    df = pd.DataFrame(counts, index=[srr])
     df.index.name='srr'
 
     # Output to standard out
-    print(df.reset_index().to_string(index=False))
+    df.reset_index().to_csv(args.counts, sep="\t", index=False)
 
 
 if __name__ == '__main__':
