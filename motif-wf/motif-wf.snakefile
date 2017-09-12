@@ -41,13 +41,13 @@ patterns = {
         'dmmpmm2009': '../data/external/meme/dmmpmm2009.meme',
         'idmmpmm2009': '../data/external/meme/idmmpmm2009.meme',
         },
-    'onTheFlyMap': '../output/onTheFlyMap.tsv',
+    'onTheFlyMap': 'onTheFlyMap.tsv',
     'fimo': {
-        'xml': '../output/fimo/motif_alignments_{meme}_{ref}.xml',
-        'html': '../output/fimo/motif_alignments_{meme}_{ref}.html',
-        'txt': '../output/fimo/motif_alignments_{meme}_{ref}.txt',
-        'gff': '../output/fimo/motif_alignments_{meme}_{ref}.gff',
-        'log': '../output/fimo/motif_alignments_{meme}_{ref}.log',
+        'xml': 'fimo/motif_alignments_{meme}_{ref}.xml',
+        'html': 'fimo/motif_alignments_{meme}_{ref}.html',
+        'txt': 'fimo/motif_alignments_{meme}_{ref}.txt',
+        'gff': 'fimo/motif_alignments_{meme}_{ref}.gff',
+        'log': 'fimo/motif_alignments_{meme}_{ref}.log',
         },
     'dm6': '../references/slopped_genes.fasta',
 }
@@ -57,6 +57,7 @@ targets = helpers.fill_patterns(patterns, fill)
 
 rule targets:
     input: utils.flatten(targets)
+
 
 rule download_meme:
     output: utils.flatten(patterns['meme'])
@@ -110,8 +111,10 @@ rule map_otf_fbgn:
         df = pd.DataFrame(results, columns=['motif_id', 'name', 'target_protein', 'FBgn'])
         df.to_csv(output[0], index=False, sep='\t')
 
+
 def _fimo(wildcards):
     return [patterns['meme'][wildcards.meme], patterns[wildcards.ref]]
+
 
 rule fimo:
     input: _fimo
@@ -126,8 +129,6 @@ rule fimo:
 
         shell(
             'fimo '
-            '--qv-thresh '
-            '--thresh 0.05 '
             '--oc {fimoTMP} '
             '{input[0]} '
             '{input[1]} '
