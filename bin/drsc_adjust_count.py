@@ -7,6 +7,7 @@ region from the GTF.
 """
 import os
 import sys
+from textwrap import dedent
 import collections
 import yaml
 
@@ -22,6 +23,9 @@ if len(sys.argv) < 3:
     sys.exit()
 
 _, SRR, BAM = sys.argv
+
+# Create an output file to store reads
+FQ = BAM + '.drsc_reads.fq'
 
 # import config
 with open('../config/config.yml') as fh:
@@ -121,6 +125,13 @@ def invert_strand(iv):
     return iv2
 
 
+def make_fq(read):
+    return dedent(""">{read_id}
+                {read_seq}
+                +
+                {read_qual}""".format(read_id=read.name, read_seq=read.seq.decode('UTF-8'), read_qual=read.qualstr.decode('UTF-8'))
+
+
 def count_algn(gene, sub, drsc):
     """Count reads aligning to gene w/ drsc, gene w/o drsc, or drsc.
 
@@ -134,6 +145,7 @@ def count_algn(gene, sub, drsc):
         'sub_count': 0,
         'drsc_count': 0
     }
+    reads = []
 
     fh = HTSeq.BAM_Reader(BAM)
     for algn in fh:
@@ -171,8 +183,9 @@ def count_algn(gene, sub, drsc):
         if len(gene_ids) == 1:
             gene_id = list(gene_ids)[0]
             counter['drsc_count'] += 1
+            reads.append(make_fq(algn.read))
 
-    return counter
+    return counter, reads
 
 
 def get_bed_len(bed):
@@ -212,7 +225,11 @@ def main():
     drsc_interval = build_interval_from_list(drsc_bed)
 
     # Count alignments
-    counts = count_algn(gene_interval, gene_sub_interval, drsc_interval)
+    counts, reads = count_algn(gene_interval, gene_sub_interval, drsc_interval)
+
+    # output list of reads that aligned to DRSC
+    with open(FQ, 'w') as fh:
+        fh.write('\n'.join(reads))
 
     # Add metadata
     counts['gene'] = fbgn
