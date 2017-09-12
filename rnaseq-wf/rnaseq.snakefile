@@ -47,6 +47,8 @@ patterns = {
     },
     'fastq_screen': '{sample_dir}/{sample}/{sample}.cutadapt.screen.txt',
     'featurecounts': '{sample_dir}/{sample}/{sample}.cutadapt.bam.featurecounts.txt',
+    'adjustedcounts': '{sample_dir}/{sample}/{sample}.cutadapt.bam.adjustedcounts.txt',
+    'drscreads': '{sample_dir}/{sample}/{sample}.cutadapt.bam.drscreads.fq',
     'libsizes_table': '{agg_dir}/libsizes_table.tsv',
     'libsizes_yaml': '{agg_dir}/libsizes_table_mqc.yaml',
     'rrna_percentages_table': '{agg_dir}/rrna_percentages_table.tsv',
@@ -114,6 +116,8 @@ rule targets:
             [targets['rrna_percentages_table']] +
             [targets['multiqc']] +
             utils.flatten(targets['featurecounts']) +
+            utils.flatten(targets['adjustedcounts']) +
+            utils.flatten(targets['drscreads']) +
             utils.flatten(targets['rrna']) +
             utils.flatten(targets['markduplicates']) +
             utils.flatten(targets['salmon']) +
@@ -138,6 +142,7 @@ if 'orig_filename' in sampletable.columns:
     rule symlink_targets:
         input: targets['fastq']
 
+
 rule fastq:
     output:
         fastq=temp(patterns['fastq'])
@@ -150,6 +155,7 @@ rule fastq:
         mv $odir/{wildcards.sample}_2.fastq.gz ${{{output.fastq}/_1/_2}}
     fi
     """
+
 
 rule cutadapt:
     """
@@ -191,7 +197,9 @@ rule hisat2:
     log:
         patterns['bam'] + '.log'
     params:
-        samtools_view_extra='-F 0x04'
+        hisat2_extra='--max-intronlen 300000 --rna-strandness R',
+        samtools_view_extra='--threads 6 -q 20',
+        samtools_sort_extra='--threads 6 -l 9 -m 3G -T $TMPDIR/samtools_sort'
     threads: 6
     wrapper:
         wrapper_for('hisat2/align')
@@ -213,6 +221,7 @@ rule rRNA:
     threads: 6
     wrapper:
         wrapper_for('bowtie2/align')
+
 
 rule fastq_count:
     """
@@ -282,10 +291,35 @@ rule featurecounts:
         bam=rules.hisat2.output
     output:
         counts=patterns['featurecounts']
+    threads: 4
+    params:
+        extra='-s 2 -J'
     log:
         patterns['featurecounts'] + '.log'
     wrapper:
         wrapper_for('featurecounts')
+
+
+rule adjustedcounts:
+    """
+    Count reads with and without the DRSC reagent region.
+    """
+    input:
+        bam=rules.hisat2.output
+    output:
+        counts=patterns['adjustedcounts'],
+        reads=patterns['drscreads']
+    log:
+        patterns['adjustedcounts'] + '.log'
+    shell:
+        """
+        source activate s2rnai && \
+        python ../bin/drsc_adjust_count.py \
+            --SRR {wildcards.samplename} \
+            --BAM {input.bam} \
+            --counts {output.counts} \
+            --reads {output.reads}
+        """
 
 
 rule rrna_libsizes_table:
@@ -338,6 +372,7 @@ rule rrna_libsizes_table:
         with open(output.json, 'w') as fout:
             yaml.dump(y, fout, default_flow_style=False)
 
+
 rule libsizes_table:
     """
     Aggregate fastq and bam counts in to a single table
@@ -378,8 +413,6 @@ rule libsizes_table:
         }
         with open(output.json, 'w') as fout:
             yaml.dump(y, fout, default_flow_style=False)
-
-
 
 
 rule multiqc:
