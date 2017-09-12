@@ -58,6 +58,7 @@ targets = helpers.fill_patterns(patterns, fill)
 rule targets:
     input: utils.flatten(targets)
 
+
 rule download_meme:
     output: utils.flatten(patterns['meme'])
     params: url='http://meme-suite.org/meme-software/Databases/motifs/motif_databases.12.15.tgz'
@@ -110,8 +111,10 @@ rule map_otf_fbgn:
         df = pd.DataFrame(results, columns=['motif_id', 'name', 'target_protein', 'FBgn'])
         df.to_csv(output[0], index=False, sep='\t')
 
+
 def _fimo(wildcards):
     return [patterns['meme'][wildcards.meme], patterns[wildcards.ref]]
+
 
 rule fimo:
     input: _fimo
