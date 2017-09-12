@@ -47,10 +47,10 @@ def arguments():
                         help="The output FASTQ for reads that align to the reagent.")
 
     parser.add_argument("--config", dest="config", action='store', required=False, default='../config/config.yml',
-                        help="lcdb-wf styled config.")
+                        help="lcdb-wf styled config. [default=../config/config.yml]")
 
     parser.add_argument("--sampletable", dest="stable", action='store', required=False, default='../config/sampletable.tsv',
-                        help="lcdb-wf styled sampletable.")
+                        help="lcdb-wf styled sampletable. [default=../config/sampletable.tsv]")
 
     args = parser.parse_args()
 
