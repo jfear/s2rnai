@@ -129,8 +129,6 @@ rule fimo:
 
         shell(
             'fimo '
-            '--qv-thresh '
-            '--thresh 0.05 '
             '--oc {fimoTMP} '
             '{input[0]} '
             '{input[1]} '
