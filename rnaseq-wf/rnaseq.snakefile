@@ -307,7 +307,7 @@ rule adjustedcounts:
     input:
         bam=rules.hisat2.output
     output:
-        counts=patterns['adjustedcounts']
+        counts=patterns['adjustedcounts'],
         reads=patterns['drscreads']
     log:
         patterns['adjustedcounts'] + '.log'
