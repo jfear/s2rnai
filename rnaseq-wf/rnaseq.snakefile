@@ -124,8 +124,8 @@ rule targets:
             #utils.flatten(targets['dupradar']) +
             utils.flatten(targets['rseqc']) +
             utils.flatten(targets['collectrnaseqmetrics']) +
-            utils.flatten(targets['bigwig']) +
-            utils.flatten(targets['downstream'])
+            utils.flatten(targets['bigwig'])
+            #utils.flatten(targets['downstream'])
         )
 
 
