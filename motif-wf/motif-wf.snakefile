@@ -25,7 +25,6 @@ include: '../lcdb-wf/references.snakefile'
 
 shell.prefix('set -euo pipefail; export TMPDIR={};'.format(common.tempdir_for_biowulf()))
 shell.executable('/bin/bash')
-references_dir = common.get_references_dir(config)
 
 refdict, conversion_kwargs = common.references_dict(config)
 assembly = config['assembly']
@@ -49,7 +48,7 @@ patterns = {
         'gff': 'data/fimo/motif_alignments_{meme}_{ref}.gff',
         'log': 'data/fimo/motif_alignments_{meme}_{ref}.log',
         },
-    'dm6': '{references_dir}/{assembly}/{tag}/fasta/{assembly}_{tag}.fasta'
+    'dm6': refdict[assembly][config['gtf']['tag']]['fasta']
 }
 
 fill = dict(meme=['flyFactor', 'onTheFly', 'flyReg', 'dmmpmm2009', 'idmmpmm2009'], ref='dm6')
