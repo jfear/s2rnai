@@ -52,32 +52,30 @@ def arguments():
     parser.add_argument("--sampletable", dest="stable", action='store', required=False, default='../config/sampletable.tsv',
                         help="lcdb-wf styled sampletable. [default=../config/sampletable.tsv]")
 
+    parser.add_argument("--drsc_coords", dest="coords", action='store', required=False, default='../output/drsc_coordinates.bed',
+                        help="A BED file with DRSC coordinates. [default=../output/drsc_coordinates.bed]")
+
     args = parser.parse_args()
 
     return args
 
 
-def get_drsc_bed(drsc):
+def get_drsc_bed(bedName, drsc):
     """Import DRSC metadata.
 
     Returns
     -------
     pybedtools.BedTool: With coordinates for the current DRSC.
     """
-    bed = pd.read_table('../output/drsc_coordinates.bed', header=None)
+    bed = pd.read_table(bedName, header=None)
     bed.columns = 'chrom', 'start', 'end', 'rname', 'score', 'strand'
     bed.chrom = 'chr' + bed.chrom
     mask = bed.rname == drsc
     return pybedtools.BedTool(bed[mask].values.tolist())
 
 
-def get_gtf_name():
+def get_gtf_name(config):
     """Return filename of GTF."""
-    # import config
-    global args
-    with open(args.config) as fh:
-        config = yaml.load(fh)
-
     assembly = config['assembly']
     tag = config['aligner']['tag']
     return os.path.join(os.environ['REFERENCES_DIR'],
@@ -91,16 +89,16 @@ def featuretype_filter(feature, featuretype, fbgn):
     return False
 
 
-def filter_gtf(fbgn):
+def filter_gtf(config, fbgn):
     """Filter out exons for the current gene.
 
     Returns
     -------
     pybedtools.BedTool: With only exons for the current gene.
     """
-    fname = get_gtf_name()
+    fname = get_gtf_name(config)
     with open(fname) as fh:
-        gtf = pybedtools.BedTool(fh.read().strip(), from_string=True)
+        gtf = pybedtools.BedTool([x for x in fh.readlines() if x != '\n'])
 
     return pybedtools.BedTool(gtf.filter(featuretype_filter,
                                          'exon', fbgn).saveas().fn)
@@ -162,7 +160,7 @@ def make_fq(read):
                 {read_qual}""".format(read_id=read.name, read_seq=read.seq.decode('UTF-8'), read_qual=read.qualstr.decode('UTF-8')))
 
 
-def count_algn(gene, sub, drsc):
+def count_algn(gene, sub, drsc, bam):
     """Count reads aligning to gene w/ drsc, gene w/o drsc, or drsc.
 
     Returns
@@ -170,7 +168,6 @@ def count_algn(gene, sub, drsc):
     dict:
         A dicitonary with counts.
     """
-    global args
     counter = {
         'gene_count': 0,
         'sub_count': 0,
@@ -178,7 +175,7 @@ def count_algn(gene, sub, drsc):
     }
     reads = []
 
-    fh = HTSeq.BAM_Reader(args.bam)
+    fh = HTSeq.BAM_Reader(bam)
     for algn in fh:
         # skip reads that are on different chromosomes
         if algn.iv.chrom not in list(gene.chrom_vectors.keys()):
@@ -236,8 +233,11 @@ def get_bed_len(bed):
 
 def main():
     # Import commandline arguments.
-    global args
     args = arguments()
+
+    # import config
+    with open(args.config) as fh:
+        config = yaml.load(fh)
 
     # import sample table information
     stable = pd.read_table(args.stable)
@@ -247,10 +247,10 @@ def main():
     fbgn = stable[mask].target_FBgn.iloc[0]
 
     # Import drsc
-    drsc_bed = get_drsc_bed(drsc)
+    drsc_bed = get_drsc_bed(args.coords, drsc)
 
     # Import GTF
-    gene_bed = filter_gtf(fbgn)
+    gene_bed = filter_gtf(config, fbgn)
 
     # Subtract DRSC from GTF
     gene_sub = gene_bed.subtract(drsc_bed)
@@ -261,7 +261,7 @@ def main():
     drsc_interval = build_interval_from_list(drsc_bed)
 
     # Count alignments
-    counts, reads = count_algn(gene_interval, gene_sub_interval, drsc_interval)
+    counts, reads = count_algn(gene_interval, gene_sub_interval, drsc_interval, args.bam)
 
     # output list of reads that aligned to DRSC
     with open(args.reads, 'w') as fh:
