@@ -40,6 +40,11 @@ patterns = {
         'cutadapt': '{sample_dir}/{sample}/fastqc/{sample}_R1.cutadapt.fastq.gz_fastqc.zip',
         'bam': '{sample_dir}/{sample}/fastqc/{sample}.cutadapt.bam_fastqc.zip',
     },
+    'fastqc_blast': {
+        'raw': '{sample_dir}/{sample}/fastqc/{sample}_R1.fastq.gz_fastqc.zip.blast.txt',
+        'cutadapt': '{sample_dir}/{sample}/fastqc/{sample}_R1.cutadapt.fastq.gz_fastqc.zip.blast.txt',
+        'bam': '{sample_dir}/{sample}/fastqc/{sample}.cutadapt.bam_fastqc.zip.blast.txt',
+    },
     'libsizes': {
         'fastq':   '{sample_dir}/{sample}/{sample}_R1.fastq.gz.libsize',
         'cutadapt': '{sample_dir}/{sample}/{sample}_R1.cutadapt.fastq.gz.libsize',
@@ -110,11 +115,12 @@ rule targets:
         (
             targets['bam'] +
             utils.flatten(targets['fastqc']) +
+            #utils.flatten(targets['fastqc_blast']) +
             utils.flatten(targets['libsizes']) +
             [targets['fastq_screen']] +
             [targets['libsizes_table']] +
             [targets['rrna_percentages_table']] +
-            [targets['multiqc']] +
+            #[targets['multiqc']] +
             utils.flatten(targets['featurecounts']) +
             utils.flatten(targets['adjustedcounts']) +
             utils.flatten(targets['drscreads']) +
@@ -184,6 +190,25 @@ rule fastqc:
     wrapper:
         wrapper_for('fastqc')
 
+
+#rule blast_fastqc:
+#    input:
+#        fastqc='{sample_dir}/{sample}/fastqc/{sample}{suffix}'
+#    output:
+#        blast='{sample_dir}/{sample}/fastqc/{sample}{suffix}.blast.txt',
+#    log:
+#        '{sample_dir}/{sample}/fastqc/{sample}{suffix}.blast.txt.log',
+#    shell: """
+#    tmp=`mktemp` \
+#    && cdir=`${{{input.fastqc}}/.cutadapt//} \
+#    echo $cdir
+#    #&& unzip -p {input.fastqc} $cdir/fastqc_data.txt > $tmp \
+#    #&& blastFastQC \
+#    #    --input $tmp \
+#    #    --output {output.blast} \
+#    #    --db /fdb/blastdb/nt \
+#    #    --evalue 0.0001
+#    """
 
 rule hisat2:
     """
