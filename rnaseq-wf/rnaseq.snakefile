@@ -124,8 +124,8 @@ rule targets:
             #utils.flatten(targets['dupradar']) +
             utils.flatten(targets['rseqc']) +
             utils.flatten(targets['collectrnaseqmetrics']) +
-            utils.flatten(targets['bigwig']) +
-            utils.flatten(targets['downstream'])
+            utils.flatten(targets['bigwig'])
+            #utils.flatten(targets['downstream'])
         )
 
 
@@ -315,7 +315,7 @@ rule adjustedcounts:
         """
         source activate s2rnai && \
         python ../bin/drsc_adjust_count.py \
-            --SRR {wildcards.samplename} \
+            --SRR {wildcards.sample} \
             --BAM {input.bam} \
             --counts {output.counts} \
             --reads {output.reads}

@@ -11,24 +11,23 @@ import pandas as pd
 from lcdblib.snakemake import helpers
 from lcdblib.utils import utils
 
+sys.path.insert(0, '../lcdb-wf')
+from lib import common
+
 sys.path.insert(0, '../lib/python')
 from s2rnai import meme
 
-try:
-    TMPDIR = os.path.join('/lscratch', os.getenv('SLURM_JOBID'))
-    assert os.path.exists(TMPDIR)
-except:
-    try:
-        TMPDIR = os.getenv('TMPDIR')
-        assert os.path.exists(TMPDIR)
-    except:
-        from tempfile import mkdtemp
-        TMPDIR = mkdtemp(dir='.snakemake/')
-        print('Temporary storage is at: {}'.format(TMPDIR))
+# ----------------------------------------------------------------------------
+# SETUP
+# ----------------------------------------------------------------------------
 
-shell.prefix("set -euo pipefail; export TMPDIR={};".format(TMPDIR))
+include: '../lcdb-wf/references.snakefile'
 
-workdir: '.'
+shell.prefix('set -euo pipefail; export TMPDIR={};'.format(common.tempdir_for_biowulf()))
+shell.executable('/bin/bash')
+
+refdict, conversion_kwargs = common.references_dict(config)
+assembly = config['assembly']
 
 ################################################################################
 # Set up file naming patterns
@@ -41,15 +40,15 @@ patterns = {
         'dmmpmm2009': '../data/external/meme/dmmpmm2009.meme',
         'idmmpmm2009': '../data/external/meme/idmmpmm2009.meme',
         },
-    'onTheFlyMap': 'onTheFlyMap.tsv',
+    'onTheFlyMap': 'data/onTheFlyMap.tsv',
     'fimo': {
-        'xml': 'fimo/motif_alignments_{meme}_{ref}.xml',
-        'html': 'fimo/motif_alignments_{meme}_{ref}.html',
-        'txt': 'fimo/motif_alignments_{meme}_{ref}.txt',
-        'gff': 'fimo/motif_alignments_{meme}_{ref}.gff',
-        'log': 'fimo/motif_alignments_{meme}_{ref}.log',
+        'xml': 'data/fimo/motif_alignments_{meme}_{ref}.xml',
+        'html': 'data/fimo/motif_alignments_{meme}_{ref}.html',
+        'txt': 'data/fimo/motif_alignments_{meme}_{ref}.txt',
+        'gff': 'data/fimo/motif_alignments_{meme}_{ref}.gff',
+        'log': 'data/fimo/motif_alignments_{meme}_{ref}.log',
         },
-    'dm6': '../references/slopped_genes.fasta',
+    'dm6': refdict[assembly][config['gtf']['tag']]['fasta']
 }
 
 fill = dict(meme=['flyFactor', 'onTheFly', 'flyReg', 'dmmpmm2009', 'idmmpmm2009'], ref='dm6')
