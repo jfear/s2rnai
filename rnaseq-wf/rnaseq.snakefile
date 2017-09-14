@@ -115,7 +115,7 @@ rule targets:
         (
             targets['bam'] +
             utils.flatten(targets['fastqc']) +
-            #utils.flatten(targets['fastqc_blast']) +
+            utils.flatten(targets['fastqc_blast']) +
             utils.flatten(targets['libsizes']) +
             [targets['fastq_screen']] +
             [targets['libsizes_table']] +
@@ -191,24 +191,22 @@ rule fastqc:
         wrapper_for('fastqc')
 
 
-#rule blast_fastqc:
-#    input:
-#        fastqc='{sample_dir}/{sample}/fastqc/{sample}{suffix}'
-#    output:
-#        blast='{sample_dir}/{sample}/fastqc/{sample}{suffix}.blast.txt',
-#    log:
-#        '{sample_dir}/{sample}/fastqc/{sample}{suffix}.blast.txt.log',
-#    shell: """
-#    tmp=`mktemp` \
-#    && cdir=`${{{input.fastqc}}/.cutadapt//} \
-#    echo $cdir
-#    #&& unzip -p {input.fastqc} $cdir/fastqc_data.txt > $tmp \
-#    #&& blastFastQC \
-#    #    --input $tmp \
-#    #    --output {output.blast} \
-#    #    --db /fdb/blastdb/nt \
-#    #    --evalue 0.0001
-#    """
+rule fastqc_blast:
+    input:
+        fastqc='{sample_dir}/{sample}/fastqc/{sample}{suffix}'
+    output:
+        blast='{sample_dir}/{sample}/fastqc/{sample}{suffix}.blast.txt',
+    log:
+        '{sample_dir}/{sample}/fastqc/{sample}{suffix}.blast.txt.log',
+    shell: """
+    ../bin/blastFastQC \
+        --input {input.fastqc} \
+        --output {output.blast} \
+        --samplename {wildcards.sample} \
+        --db /fdb/blastdb/nt \
+        --evalue 0.0001
+    """
+
 
 rule hisat2:
     """
