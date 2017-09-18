@@ -32,6 +32,10 @@ agg_dir = config.get('aggregation_dir', 'aggregation')
 # PATTERNS
 # ----------------------------------------------------------------------------
 patterns = {
+    'intergenic': {
+        'bed': 'data/intergenic_slop100bp.bed',
+        'gtf': 'data/intergenic_slop100bp.gtf',
+    },
     'fastq':   '{sample_dir}/{sample}/{sample}_R1.fastq.gz',
     'cutadapt': '{sample_dir}/{sample}/{sample}_R1.cutadapt.fastq.gz',
     'bam':     '{sample_dir}/{sample}/{sample}.cutadapt.bam',
@@ -51,7 +55,10 @@ patterns = {
         'bam':     '{sample_dir}/{sample}/{sample}.cutadapt.bam.libsize',
     },
     'fastq_screen': '{sample_dir}/{sample}/{sample}.cutadapt.screen.txt',
-    'featurecounts': '{sample_dir}/{sample}/{sample}.cutadapt.bam.featurecounts.txt',
+    'featurecounts': {
+        'genic': '{sample_dir}/{sample}/{sample}.cutadapt.bam.featurecounts.txt',
+        'intergenic': '{sample_dir}/{sample}/{sample}.cutadapt.bam.featurecounts.intergenic.txt',
+    },
     'adjustedcounts': '{sample_dir}/{sample}/{sample}.cutadapt.bam.adjustedcounts.txt',
     'drscreads': '{sample_dir}/{sample}/{sample}.cutadapt.bam.drscreads.fq',
     'libsizes_table': '{agg_dir}/libsizes_table.tsv',
@@ -113,6 +120,7 @@ rule targets:
     """
     input:
         (
+            utils.flatten(targets['intergenic']) +
             targets['bam'] +
             utils.flatten(targets['fastqc']) +
             utils.flatten(targets['fastqc_blast']) +
@@ -120,14 +128,13 @@ rule targets:
             [targets['fastq_screen']] +
             [targets['libsizes_table']] +
             [targets['rrna_percentages_table']] +
-            #[targets['multiqc']] +
+            [targets['multiqc']] +
             utils.flatten(targets['featurecounts']) +
             utils.flatten(targets['adjustedcounts']) +
             utils.flatten(targets['drscreads']) +
             utils.flatten(targets['rrna']) +
             utils.flatten(targets['markduplicates']) +
             utils.flatten(targets['salmon']) +
-            #utils.flatten(targets['dupradar']) +
             utils.flatten(targets['rseqc']) +
             utils.flatten(targets['collectrnaseqmetrics']) +
             utils.flatten(targets['bigwig'])
@@ -147,6 +154,35 @@ if 'orig_filename' in sampletable.columns:
 
     rule symlink_targets:
         input: targets['fastq']
+
+
+rule intergenic:
+    input:
+        db=refdict[assembly][config['aligner']['tag']]['gtf'] + '.db'
+    output:
+        bed=patterns['intergenic']['bed'],
+        gtf=patterns['intergenic']['gtf']
+    run:
+        import gffutils
+        from gffutils.pybedtools_integration import to_bedtool, featurefuncs
+        db = gffutils.FeatureDB(input.db)
+        gene = to_bedtool(db.features_of_type('gene')).saveas()
+        slopped = gene.slop(b=100, genome='dm6')
+        merged = slopped.sort().merge()
+        complement = merged.complement(genome='dm6').saveas(output.bed)
+
+        global cnt
+        cnt = 1
+        def interName(feature):
+            global cnt
+            gff = featurefuncs.bed2gff(feature)
+            gff[1] = 'bedtools'
+            gff[2] = 'gene'
+            gff.name = 'intergenic{}'.format(cnt)
+            cnt += 1
+            return gff
+
+        complement.each(interName).saveas(output.gtf)
 
 
 rule fastq:
@@ -228,24 +264,6 @@ rule hisat2:
         wrapper_for('hisat2/align')
 
 
-rule rRNA:
-    """
-    Map reads with bowtie2 to the rRNA reference
-    """
-    input:
-        fastq=rules.cutadapt.output.fastq,
-        index=[refdict[assembly][config['rrna']['tag']]['bowtie2']]
-    output:
-        bam=patterns['rrna']['bam']
-    log:
-        patterns['rrna']['bam'] + '.log'
-    params:
-        samtools_view_extra='-F 0x04'
-    threads: 6
-    wrapper:
-        wrapper_for('bowtie2/align')
-
-
 rule fastq_count:
     """
     Count reads in a FASTQ file
@@ -313,12 +331,30 @@ rule featurecounts:
         annotation=refdict[assembly][config['gtf']['tag']]['gtf'],
         bam=rules.hisat2.output
     output:
-        counts=patterns['featurecounts']
+        counts=patterns['featurecounts']['genic']
     threads: 4
     params:
         extra='-s 2 -J'
     log:
-        patterns['featurecounts'] + '.log'
+        patterns['featurecounts']['genic'] + '.log'
+    wrapper:
+        wrapper_for('featurecounts')
+
+
+rule featurecounts_intergenic:
+    """
+    Count reads in intergenic regions with featureCounts from the subread package
+    """
+    input:
+        annotation=targets['intergenic']['gtf'],
+        bam=rules.hisat2.output
+    output:
+        counts=patterns['featurecounts']['intergenic']
+    threads: 4
+    params:
+        extra='-s 0 -J'
+    log:
+        patterns['featurecounts']['intergenic'] + '.log'
     wrapper:
         wrapper_for('featurecounts')
 
