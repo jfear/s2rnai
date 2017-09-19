@@ -32,8 +32,8 @@ def arguments():
     downstream analysis.
 
     This script creates two files:
-    * <ODIR>/*.bam.counts contains the counts to gene, gene w/o drsc region, and drsc region.
-    * <ODIR>/*.bam.reads contains the reads that map to the drsc region.
+    * <ODIR>/*.bam.drsc.counts contains the counts to gene, gene w/o drsc region, and drsc region.
+    * <ODIR>/*.bam.drsc.reads.fq contains the reads that map to the drsc region.
     """)
 
     parser = argparse.ArgumentParser(description=DESCRIPTION, formatter_class=Raw)
@@ -267,7 +267,7 @@ def main():
         counts, reads = count_algn(gene_interval, gene_sub_interval, drsc_interval, args.bam)
 
         # output list of reads that aligned to DRSC
-        readName = os.path.join(args.odir, fname + '.reads')
+        readName = os.path.join(args.odir, fname + '.drsc.reads.fq')
         with open(readName, 'w') as fh:
             fh.write('\n'.join(reads))
 
@@ -285,7 +285,7 @@ def main():
         df.index.name='srr'
 
         # Output to standard out
-        countName = os.path.join(args.odir, fname + '.counts')
+        countName = os.path.join(args.odir, fname + '.drsc.counts')
         df.reset_index().to_csv(countName, sep="\t", index=False)
 
 
