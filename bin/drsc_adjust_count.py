@@ -30,6 +30,10 @@ def arguments():
     of reads that align to the reagent region. This script also outputs a list
     of reads that align to the reagent in case we want to do some more
     downstream analysis.
+
+    This script creates two files:
+    * <ODIR>/*.bam.drsc.counts contains the counts to gene, gene w/o drsc region, and drsc region.
+    * <ODIR>/*.bam.drsc.reads.fq contains the reads that map to the drsc region.
     """)
 
     parser = argparse.ArgumentParser(description=DESCRIPTION, formatter_class=Raw)
@@ -37,14 +41,11 @@ def arguments():
     parser.add_argument("--SRR", dest="srr", action='store', required=True,
                         help="Give the SRR identifier.")
 
-    parser.add_argument("--BAM", dest="bam", action='store', required=True,
-                        help="Path to the BAM file to analyze")
+    parser.add_argument("--BAM", dest="bam", type=list, action='store', required=True,
+                        help="A list of BAM files to analyze")
 
-    parser.add_argument("--counts", dest="counts", action='store', required=True,
-                        help="The output counts table.")
-
-    parser.add_argument("--reads", dest="reads", action='store', required=True,
-                        help="The output FASTQ for reads that align to the reagent.")
+    parser.add_argument("--out", dest="odir", action='store', required=True,
+                        help="The output direcotry.")
 
     parser.add_argument("--config", dest="config", action='store', required=False, default='../config/config.yml',
                         help="lcdb-wf styled config. [default=../config/config.yml]")
@@ -261,27 +262,31 @@ def main():
     drsc_interval = build_interval_from_list(drsc_bed)
 
     # Count alignments
-    counts, reads = count_algn(gene_interval, gene_sub_interval, drsc_interval, args.bam)
+    for bam in args.bam:
+        fname = os.path.basename(bam)
+        counts, reads = count_algn(gene_interval, gene_sub_interval, drsc_interval, args.bam)
 
-    # output list of reads that aligned to DRSC
-    with open(args.reads, 'w') as fh:
-        fh.write('\n'.join(reads))
+        # output list of reads that aligned to DRSC
+        readName = os.path.join(args.odir, fname + '.drsc.reads.fq')
+        with open(readName, 'w') as fh:
+            fh.write('\n'.join(reads))
 
-    # Add metadata
-    counts['gene'] = fbgn
-    counts['drsc'] = drsc
+        # Add metadata
+        counts['gene'] = fbgn
+        counts['drsc'] = drsc
 
-    # Get lengths
-    counts['gene_length'] = get_bed_len(gene_bed)
-    counts['sub_length'] = get_bed_len(gene_sub)
-    counts['drsc_length'] = get_bed_len(drsc_bed)
+        # Get lengths
+        counts['gene_length'] = get_bed_len(gene_bed)
+        counts['sub_length'] = get_bed_len(gene_sub)
+        counts['drsc_length'] = get_bed_len(drsc_bed)
 
-    # Make DataFrame
-    df = pd.DataFrame(counts, index=[srr])
-    df.index.name='srr'
+        # Make DataFrame
+        df = pd.DataFrame(counts, index=[srr])
+        df.index.name='srr'
 
-    # Output to standard out
-    df.reset_index().to_csv(args.counts, sep="\t", index=False)
+        # Output to standard out
+        countName = os.path.join(args.odir, fname + '.drsc.counts')
+        df.reset_index().to_csv(countName, sep="\t", index=False)
 
 
 if __name__ == '__main__':
