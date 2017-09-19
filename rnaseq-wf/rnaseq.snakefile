@@ -27,6 +27,9 @@ assembly = config['assembly']
 
 sample_dir = config.get('sample_dir', 'samples')
 agg_dir = config.get('aggregation_dir', 'aggregation')
+sampletable['sample_dir'] = sample_dir
+sampletable['agg_dir'] = agg_dir
+sampletable.rename(columns={'samplename': 'sample'}, inplace=True)
 
 # ----------------------------------------------------------------------------
 # PATTERNS
@@ -59,8 +62,10 @@ patterns = {
         'genic': '{sample_dir}/{sample}/{sample}.cutadapt.bam.featurecounts.txt',
         'intergenic': '{sample_dir}/{sample}/{sample}.cutadapt.bam.featurecounts.intergenic.txt',
     },
-    'adjustedcounts': '{sample_dir}/{sample}/{sample}.cutadapt.bam.adjustedcounts.txt',
-    'drscreads': '{sample_dir}/{sample}/{sample}.cutadapt.bam.drscreads.fq',
+    'adjustedcounts': {
+        'counts': '{sample_dir}/{sample}/{sample}.cutadapt.bam.drsc.counts',
+        'reads': '{sample_dir}/{sample}/{sample}.cutadapt.bam.drsc.reads.fq',
+    },
     'libsizes_table': '{agg_dir}/libsizes_table.tsv',
     'libsizes_yaml': '{agg_dir}/libsizes_table_mqc.yaml',
     'rrna_percentages_table': '{agg_dir}/rrna_percentages_table.tsv',
@@ -103,8 +108,7 @@ patterns = {
         'rnaseq': 'downstream/rnaseq.html',
     }
 }
-fill = dict(sample=samples, sample_dir=sample_dir, agg_dir=agg_dir)
-targets = helpers.fill_patterns(patterns, fill)
+targets = helpers.fill_patterns(patterns, sampletable)
 
 
 def wrapper_for(path):
@@ -131,7 +135,6 @@ rule targets:
             [targets['multiqc']] +
             utils.flatten(targets['featurecounts']) +
             utils.flatten(targets['adjustedcounts']) +
-            utils.flatten(targets['drscreads']) +
             utils.flatten(targets['rrna']) +
             utils.flatten(targets['markduplicates']) +
             utils.flatten(targets['salmon']) +
@@ -365,25 +368,35 @@ rule featurecounts_intergenic:
         wrapper_for('featurecounts')
 
 
+def _adjustcounts_odir(wildcards):
+    return os.path.dirname(expand(patterns['adjustedcounts'], **wildcards)[0])
+
+
+def _adjustcounts_bam(wildcards):
+    rows = sampletable[(sampletable['sample'] == wildcards.sample) | (sampletable.target_symbol == 'LacZ')].copy()
+    return expand(patterns['bam'], zip, **rows.to_dict('list'))
+
+
 rule adjustedcounts:
     """
     Count reads with and without the DRSC reagent region.
     """
     input:
-        bam=rules.hisat2.output
+        bam=_adjustcounts_bam
     output:
-        counts=patterns['adjustedcounts'],
-        reads=patterns['drscreads']
+        counts=patterns['adjustedcounts']['counts'],
+        reads=patterns['adjustedcounts']['reads'],
     log:
-        patterns['adjustedcounts'] + '.log'
+        patterns['adjustedcounts']['counts'] + '.log'
+    params:
+        odir=_adjustcounts_odir,
     shell:
         """
         source activate s2rnai && \
         python ../bin/drsc_adjust_count.py \
             --SRR {wildcards.sample} \
             --BAM {input.bam} \
-            --counts {output.counts} \
-            --reads {output.reads}
+            --output {params.odir}
         """
 
 
