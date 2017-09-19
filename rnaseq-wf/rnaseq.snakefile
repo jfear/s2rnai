@@ -178,7 +178,7 @@ rule intergenic:
             gff = featurefuncs.bed2gff(feature)
             gff[1] = 'bedtools'
             gff[2] = 'gene'
-            gff.name = 'intergenic{}'.format(cnt)
+            gff.attrs['gene_id'] = 'intergenic{}'.format(cnt)
             cnt += 1
             return gff
 
