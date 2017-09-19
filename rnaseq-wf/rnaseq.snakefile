@@ -396,7 +396,7 @@ rule adjustedcounts:
         python ../bin/drsc_adjust_count.py \
             --SRR {wildcards.sample} \
             --BAM {input.bam} \
-            --output {params.odir}
+            --out {params.odir}
         """
 
 
