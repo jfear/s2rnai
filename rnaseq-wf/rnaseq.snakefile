@@ -169,20 +169,26 @@ rule intergenic:
         gene = to_bedtool(db.features_of_type('gene')).saveas()
         slopped = gene.slop(b=100, genome='dm6')
         merged = slopped.sort().merge()
-        complement = merged.complement(genome='dm6').saveas(output.bed)
+        complement = merged.complement(genome='dm6').saveas()
 
         global cnt
         cnt = 1
         def interName(feature):
             global cnt
+            feature = featurefuncs.extend_fields(feature, 4)
+            feature.name = 'intergenic{}'.format(cnt)
+            cnt += 1
+            return feature
+
+        def interGFF(feature):
             gff = featurefuncs.bed2gff(feature)
             gff[1] = 'bedtools'
             gff[2] = 'gene'
-            gff.attrs['gene_id'] = 'intergenic{}'.format(cnt)
-            cnt += 1
+            gff.attrs['gene_id'] = gff.name
             return gff
 
-        complement.each(interName).saveas(output.gtf)
+        bed = complement.each(interName).saveas(output.bed)
+        bed.each(interGFF).saveas(output.gtf)
 
 
 rule fastq:
@@ -352,7 +358,7 @@ rule featurecounts_intergenic:
         counts=patterns['featurecounts']['intergenic']
     threads: 4
     params:
-        extra='-s 0 -J'
+        extra='-s 0 -J -t gene'
     log:
         patterns['featurecounts']['intergenic'] + '.log'
     wrapper:
