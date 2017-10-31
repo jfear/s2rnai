@@ -14,12 +14,13 @@ rule all:
 
 rule cut_table:
 #separate needed information from metadata
-    input: expand("{fbgn}", fbgn=fbgn)
+    input: expand("{fbgn}.bed", fbgn=fbgn)
     output: cut = temp("{fbgn}_cut"),
             metadata = temp("{fbgn}_metadata")
     run:
-        big = pd.read_table(input[0])
-        bedtrim = big[['chrom', 'start','end','id']]
+        big = pd.read_table(input[0], header=None) #will this mess up if there is header? 
+        big['id'] = ['id='+str(x) for x in range(0, len(big[0]))]
+        bedtrim = big[[0, 1, 2,'id']]
         metacolumns = ['id']
         for val in big.columns.values:
             if val not in bedtrim.columns.values:
@@ -67,18 +68,14 @@ rule check_phantompeaks:
 #determine the amount of phantom peak overlap in the dataset  
     input: merged = "out/{fbgn}_merged",
            phantompeaks = "gkv637_Supplementary_Data/Supplementary_table_3__List_of_Phantom_Peaks.xlsx"
-    output: withpeaks = "out/{fbgn}_withpeaks", 
+    output: #withpeaks = "out/{fbgn}_withpeaks", 
             nophantom = "out/{fbgn}_nophantom"
     run:
          phantom = pd.read_excel(input.phantompeaks)[['chr ','start','end','Name']]
          merged = pd.read_table(input.merged)
-         bed = merged[['chrom','start','end','modENCODE_id']]
+         bed = merged[['chrom','start','end']]
          intersect = pybedtools.BedTool.from_dataframe(bed).intersect(pybedtools.BedTool.from_dataframe(phantom), wo=True).to_dataframe()
-         filtered = intersect[intersect.itemRgb >= 50]
-         filtered.to_csv(output.withpeaks, sep='\t', index=False)
+         filtered = intersect[intersect.thickEnd >= 50]
+         #filtered.to_csv(output.withpeaks, sep='\t', index=False) Don't think we need this
          outermerge = merged.merge(filtered, how='outer', on=['start','end'], indicator=True)
-         no_phantom = outermerge[outermerge._merge == 'left_only'].to_csv(output.nophantom, sep='\t', index=False)
-   
-# # ? questions ? # #
-# does it make sense to merge back information from merged onto the withpeaks table? 
-# should i put xlrd install somewhere? add into s2rnai? 
+         no_phantom = outermerge[outermerge._merge == 'left_only'].to_csv(output.nophantom, sep='\t', header=None, index=False)
