@@ -41,7 +41,7 @@ def arguments():
     parser.add_argument("--SRR", dest="srr", action='store', required=True,
                         help="Give the SRR identifier.")
 
-    parser.add_argument("--BAM", dest="bam", type=list, action='store', required=True,
+    parser.add_argument("--BAM", dest="bam", nargs='+', action='store', required=True,
                         help="A list of BAM files to analyze")
 
     parser.add_argument("--out", dest="odir", action='store', required=True,
@@ -264,7 +264,8 @@ def main():
     # Count alignments
     for bam in args.bam:
         fname = os.path.basename(bam)
-        counts, reads = count_algn(gene_interval, gene_sub_interval, drsc_interval, args.bam)
+        curr_srr = fname.split('.')[0]
+        counts, reads = count_algn(gene_interval, gene_sub_interval, drsc_interval, bam)
 
         # output list of reads that aligned to DRSC
         readName = os.path.join(args.odir, fname + '.drsc.reads.fq')
@@ -281,7 +282,7 @@ def main():
         counts['drsc_length'] = get_bed_len(drsc_bed)
 
         # Make DataFrame
-        df = pd.DataFrame(counts, index=[srr])
+        df = pd.DataFrame(counts, index=[curr_srr])
         df.index.name='srr'
 
         # Output to standard out

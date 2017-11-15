@@ -369,7 +369,7 @@ rule featurecounts_intergenic:
 
 
 def _adjustcounts_odir(wildcards):
-    return os.path.dirname(expand(patterns['adjustedcounts'], **wildcards)[0])
+    return os.path.dirname(expand(patterns['adjustedcounts']['counts'], **wildcards)[0])
 
 
 def _adjustcounts_bam(wildcards):
@@ -389,7 +389,7 @@ rule adjustedcounts:
     log:
         patterns['adjustedcounts']['counts'] + '.log'
     params:
-        odir=_adjustcounts_odir,
+        odir=_adjustcounts_odir
     shell:
         """
         source activate s2rnai && \

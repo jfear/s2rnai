@@ -28,3 +28,7 @@ markduplicates:
 
 bowtie2_map_to_reduced_genome:
   mem: '32g'
+
+adjustedcounts:
+  mem: '8g'
+  time: '12:00:00'
