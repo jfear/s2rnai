@@ -21,11 +21,13 @@ cmds = (
 # add any per-peak-calling-run extra commands
 cmds += extra
 
+print({log})
 shell(cmds + ' {log}')
+
 
 # Depending on whether --broad was used, we may have a "*_peaks.narrowPeak" or
 # a "*_peaks.broadPeak". Figure out which it is, and symlink to the output.
 hits = glob.glob(os.path.join(outdir, '*_peaks.*Peak'))
-assert (len(hits) == 1) and (hits[0].split('.')[-1].lower() in ['narrowpeak', 'broadpeak']), hits
+assert (hits[0].split('.')[-1].lower() in ['narrowpeak', 'broadpeak']), hits
 basehit = os.path.basename(hits[0])
 shell('cd {outdir} && ln -sf {basehit} {basebed}')

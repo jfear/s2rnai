@@ -49,24 +49,63 @@ chipseq:
   # at least a BED file of peaks.
   #
   peak_calling:
-    - label: anti-Yki-1
+    - label: CTCF-1--5
       algorithm: macs2
       ip:
-        - anti-Yki-1
+        - CTCF-1
       control:
         - input-1
-      extra: '--nomodel --extsize 147'
+      extra: '-g dm -s 36 --bw 100 -p 1e-5 --bdg --broad'
 
-    - label: anti-Yki-2
+    - label: CTCF-2--5
+      algorithm: macs2
+      ip:
+        - CTCF-2
+      control:
+        - input-2
+      extra: '-g dm -s 36 --bw 100 -p 1e-5 --bdg --broad'
+
+    - label: CTCF-1--1
+      algorithm: macs2
+      ip:
+        - CTCF-1
+      control:
+        - input-1
+      extra: '-g dm -s 36 --bw 100 -p 1e-1 --bdg --broad'
+
+    - label: CTCF-2--1
+      algorithm: macs2
+      ip:
+        - CTCF-2
+      control:
+        - input-2
+      extra: '-g dm -s 36 --bw 100 -p 1e-1 --bdg --broad'
+    
+    - label: CTCF-1--12
+      algorithm: macs2
+      ip:
+        - CTCF-1
+      control:
+        - input-1
+      extra: '-g dm -s 36 --bw 100 -p 1e-12 --bdg --broad'
+
+    - label: CTCF-2--12
+      algorithm: macs2
+      ip:
+        - CTCF-2
+      control:
+        - input-2
+      extra: '-g dm -s 36 --bw 100 -p 1e-12 --bdg --broad'
+
+    - label: CTCF-1-narrow
       algorithm: spp
       ip:
-        - anti-Yki-2
+        - CTCF-1
       control:
         - input-1
       extra:
         fdr: 0.3
         zthr: 4
-
 aligner:
   index: 'bowtie2'
   tag: 'test'

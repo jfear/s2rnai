@@ -6,9 +6,15 @@ samplename	antibody	biological_material	replicate	label	orig_filename
 #ip_2	gaf	wingdisc-2	2	gaf-wingdisc-2	data/example_data/chipseq_ip2.fq.gz
 #ip_1	CP190	s2cell	1	CP190-WT1	data/sra_test_data/SRR1041448_1.fastq
 #input_1	input	s2cell	1	CP190-input	data/sra_test_data/SRR1041450_1.fastq
-SRR833688	anti-Yki	s2cell	1	anti-Yki-1	data/sra_test_data/SRR833688_R1.fastq.gz
-SRR833687	anti-Yki	s2cell	2	anti-Yki-2	data/sra_test_data/SRR833687_R1.fastq.gz
-SRR833686	input	s2cell	1	input-1	data/sra_test_data/SRR833686_R1.fastq.gz
+#SRR833688	anti-Yki	s2cell	1	anti-Yki-1	data/sra_test_data/SRR833688_R1.fastq.gz
+#SRR833687	anti-Yki	s2cell	2	anti-Yki-2	data/sra_test_data/SRR833687_R1.fastq.gz
+#SRR833686	input	s2cell	1	input-1	data/sra_test_data/SRR833686_R1.fastq.gz
+SRR034720	CTCF	s2cell	1	CTCF-1	data/sra_test_data/SRR034720_R1.fastq.gz
+SRR034721	CTCF	s2cell	1	CTCF-1	data/sra_test_data/SRR034721_R1.fastq.gz
+SRR034722	input	s2cell	1	input-1	data/sra_test_data/SRR034722_R1.fastq.gz
+SRR034723	CTCF	s2cell	1	CTCF-2	data/sra_test_data/SRR034723_R1.fastq.gz
+SRR034724	CTCF	s2cell	1	CTCF-2	data/sra_test_data/SRR034724_R1.fastq.gz
+SRR034725	input	s2cell	1	input-2	data/sra_test_data/SRR034725_R1.fastq.gz
 # Note here we are treating ip_3 and ip_4 as technical replicates for the sake of testing
 #ip_3	gaf	embryo-1	1	gaf-embryo-1	data/example_data/chipseq_ip3.fq.gz
 #ip_4	gaf	embryo-1	1	gaf-embryo-1	data/example_data/chipseq_ip4.fq.gz

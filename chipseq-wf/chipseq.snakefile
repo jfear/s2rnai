@@ -77,7 +77,7 @@ fill = dict(sample=samples, sample_dir=sample_dir, agg_dir=agg_dir, merged_dir=m
             label=sampletable.label, ip_label=sampletable.label[sampletable.antibody != 'input'],
            )
 targets = helpers.fill_patterns(patterns, fill)
-
+print(targets)
 
 def wrapper_for(path):
     return 'file:' + os.path.join('wrappers', 'wrappers', path)
