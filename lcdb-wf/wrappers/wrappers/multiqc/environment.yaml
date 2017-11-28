@@ -1,6 +1,0 @@
-channels:
-  - bioconda
-  - lcdb
-dependencies:
-  - multiqc ==1.0
-  - lcdblib ==0.1.2.post
