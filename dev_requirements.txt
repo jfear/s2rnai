@@ -1,0 +1,3 @@
+jedi
+joblib
+nb_conda
