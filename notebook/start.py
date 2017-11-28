@@ -1,10 +1,11 @@
 # Imports
 import os
 import sys
+import yaml
 
+from joblib import Memory
 import numpy as np
 import pandas as pd
-
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -17,11 +18,9 @@ from s2rnai.notebook import Nb
 nbconfig = Nb.setup_notebook()
 
 # Turn on cache
-from joblib import Memory
 memory = Memory(cachedir=nbconfig.cache, verbose=0)
 
 # Set up references
-import yaml
 with open('../../config/config.yml') as fh:
     config = yaml.load(fh)
 
