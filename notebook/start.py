@@ -1,33 +1,30 @@
-# Load useful extensions
+# Imports
 import os
 import sys
+import yaml
+from pathlib import Path
 
-# Activate the autoreload extension for easy reloading of external packages
-%reload_ext autoreload
-%autoreload 1
+from joblib import Memory
+import numpy as np
+import pandas as pd
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-# Set up cashdir
-from ipycache import CacheMagics
-CacheMagics.cachedir = '../cachedir'
-
-# Trun on the water mark
-%reload_ext watermark
-%watermark -u -d -v -g
-
-# Load ipycache extension
-%reload_ext ipycache
-from ipycache import CacheMagics
-CacheMagics.cachedir = '../cachedir'
-
-# Add project library to path
-sys.path.insert(0, '../../lcdb-wf/lib')
+# Project level imports
 sys.path.insert(0, '../../lib/python')
+from s2rnai.notebook import Nb
+
+# Setup notebook
+nbconfig = Nb.setup_notebook()
+
+# Turn on cache
+memory = Memory(cachedir=nbconfig.cache, verbose=0)
 
 # Set up references
-import yaml
 with open('../../config/config.yml') as fh:
     config = yaml.load(fh)
 
 assembly = config['assembly']
 tag = config['aligner']['tag']
-REF = os.path.join(os.environ['REFERENCES_DIR'], assembly, tag)
+REF = Path(os.environ['REFERENCES_DIR'], assembly, tag)
