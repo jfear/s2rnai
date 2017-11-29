@@ -105,7 +105,6 @@ references:
       fasta:
         url: 'ftp://ftp.flybase.net/genomes/Drosophila_melanogaster/dmel_r6.16_FB2017_03/fasta/dmel-all-transcript-r6.16.fasta.gz'
         indexes:
-          - 'kallisto'
           - 'salmon'
 
     r6-16_and_ercc:
@@ -150,7 +149,6 @@ references:
       fasta:
         url: 'ftp://ftp.sanger.ac.uk/pub/gencode/Gencode_human/release_25/gencode.v25.transcripts.fa.gz'
         indexes:
-          - 'kallisto'
           - 'salmon'
 
     gencode-v19:
@@ -170,7 +168,6 @@ references:
           - 'ftp://ftp.sanger.ac.uk/pub/gencode/Gencode_human/release_19/gencode.v19.lncRNA_transcripts.fa.gz'
         postprocess: "lib.common.cat"
         indexes:
-          - 'kallisto'
           - 'salmon'
 
     rRNA:
@@ -202,7 +199,6 @@ references:
       fasta:
         url: 'ftp://ftp.sanger.ac.uk/pub/gencode/Gencode_mouse/release_M12/gencode.vM12.transcripts.fa.gz'
         indexes:
-          - 'kallisto'
           - 'salmon'
 
   ecoli:
@@ -233,7 +229,6 @@ references:
             - "ftp://ftp.ensemblgenomes.org/pub/protists/release-33/fasta/dictyostelium_discoideum/ncrna/Dictyostelium_discoideum.dicty_2.7.ncrna.fa.gz"
         postprocess: "lib.common.cat"
         indexes:
-            - "kallisto"
             - 'salmon'
 
     ensembl_2.7:

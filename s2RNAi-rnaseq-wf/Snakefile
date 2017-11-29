@@ -45,15 +45,19 @@ rule targets:
             [c.targets['libsizes_table']] +
             [c.targets['rrna_percentages_table']] +
             [c.targets['multiqc']] +
+            [c.targets['featurecounts_agg']] +
+            [c.targets['featurecounts_intergenic_agg']] +
             utils.flatten(c.targets['intergenic']) +
+            utils.flatten(c.targets['dupradar']) +
             utils.flatten(c.targets['featurecounts']) +
+            utils.flatten(c.targets['featurecounts_intergenic']) +
             utils.flatten(c.targets['adjustedcounts']) +
             utils.flatten(c.targets['rrna']) +
             utils.flatten(c.targets['markduplicates']) +
             utils.flatten(c.targets['salmon']) +
             utils.flatten(c.targets['rseqc']) +
             utils.flatten(c.targets['collectrnaseqmetrics']) +
-            utils.flatten(c.targets['bigwig']) +
+            utils.flatten(c.targets['bigwig'])
             #utils.flatten(c.targets['downstream'])
         )
 
@@ -74,7 +78,7 @@ if 'orig_filename' in c.sampletable.columns:
 
 rule intergenic:
     input:
-        db=c.refdict[assembly][config['aligner']['tag']]['gtf'] + '.db'
+        db=c.refdict[c.assembly][config['aligner']['tag']]['gtf'] + '.db'
     output:
         bed=c.patterns['intergenic']['bed'],
         gtf=c.patterns['intergenic']['gtf']
@@ -240,7 +244,6 @@ rule bam_index:
         'samtools index {input} {output}'
 
 
-
 rule fastq_screen:
     """
     Run fastq_screen to look for contamination from other genomes
@@ -249,7 +252,7 @@ rule fastq_screen:
         fastq=rules.cutadapt.output.fastq,
         dm6=c.refdict['dmel'][config['aligner']['tag']]['bowtie2'],
         rRNA=c.refdict[c.assembly][config['rrna']['tag']]['bowtie2'],
-        phix=c.refdict['phix']['default']['bowtie2']
+        phix=c.refdict['phix']['default']['bowtie2'],
         ercc=c.refdict['ercc']['srm2374']['bowtie2'],
         human=c.refdict['human']['gencode-v25']['bowtie2'],
         mouse=c.refdict['mouse']['gencode_m12']['bowtie2'],
@@ -282,7 +285,8 @@ rule featurecounts:
         '-T {threads} '
         '-a {input.annotation} '
         '-o {output.counts} '
-        '-s 2 -J '
+        '-s 2 '
+        '-J '
         '{input.bam} '
         '&> {log}'
 
@@ -295,27 +299,28 @@ rule featurecounts_intergenic:
         annotation=c.targets['intergenic']['gtf'],
         bam=rules.hisat2.output
     output:
-        counts=c.patterns['featurecounts']['intergenic']
+        counts=c.patterns['featurecounts_intergenic']
     threads: 4
     log:
-        patterns['featurecounts']['intergenic'] + '.log'
+        c.patterns['featurecounts_intergenic'] + '.log'
     shell:
         'featureCounts '
         '-T {threads} '
         '-a {input.annotation} '
         '-o {output.counts} '
-        '-s 2 -J '
+        '-s 2 '
+        '-J '
         '{input.bam} '
         '&> {log}'
 
 
 def _adjustcounts_odir(wildcards):
-    return os.path.dirname(expand(patterns['adjustedcounts']['counts'], **wildcards)[0])
+    return os.path.dirname(expand(c.patterns['adjustedcounts']['counts'], **wildcards)[0])
 
 
 def _adjustcounts_bam(wildcards):
-    rows = c.sampletable[(c.sampletable['sample'] == wildcards.sample) | (c.sampletable.target_symbol == 'LacZ')].copy()
-    return expand(patterns['bam'], zip, **rows.to_dict('list'))
+    rows = c.sampletable[(c.sampletable.samplename == wildcards.sample) | (c.sampletable.target_symbol == 'LacZ')].copy()
+    return expand(c.patterns['bam'], zip, sample=rows.to_dict('list')['samplename'], sample_dir=c.sample_dir)
 
 
 rule adjustedcounts:
@@ -332,8 +337,7 @@ rule adjustedcounts:
     params:
         odir=_adjustcounts_odir
     shell:
-        'source activate s2rnai && '
-        'python ../bin/drsc_adjust_count.py '
+        '../bin/drsc_adjust_count.py '
         '--SRR {wildcards.sample} '
         '--BAM {input.bam} '
         '--out {params.odir}'
@@ -636,6 +640,41 @@ rule rnaseq_rmarkdown:
     shell:
         'Rscript -e '
         '''"rmarkdown::render('{input.rmd}', 'knitrBootstrap::bootstrap_document')"'''
+
+
+def parse_featureCounts_counts(sample, file):
+    """Parser for subread feature counts."""
+    df = pd.read_csv(file, sep='\t', comment='#')
+    df.columns = ['FBgn', 'chr', 'start', 'end', 'strand', 'length', 'count']
+    df['sample'] = sample
+    df.set_index(['sample', 'FBgn'], inplace=True)
+    return df['count']
+
+
+rule featurecounts_agg:
+    input: c.targets['featurecounts']
+    output: c.patterns['featurecounts_agg']
+    run:
+        dfs = []
+        for fn in input:
+            name = os.path.basename(os.path.dirname(fn))
+            dfs.append(parse_featureCounts_counts(name, fn))
+        df = pd.concat(dfs)
+        dfSBS = df.unstack(level=0)
+        dfSBS.to_csv(str(output), sep='\t')
+
+
+rule featurecounts_intergenic_agg:
+    input: c.targets['featurecounts_intergenic']
+    output: c.patterns['featurecounts_intergenic_agg']
+    run:
+        dfs = []
+        for fn in input:
+            name = os.path.basename(os.path.dirname(fn))
+            dfs.append(parse_featureCounts_counts(name, fn))
+        df = pd.concat(dfs)
+        dfSBS = df.unstack(level=0)
+        dfSBS.to_csv(str(output), sep='\t')
 
 
 # vim: ft=snakemake.python
