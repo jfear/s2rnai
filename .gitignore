@@ -8,5 +8,5 @@ output
 *slurm_logs
 *.snakemake
 *.log
-bin/slurm-*
+slurm-*
 references
