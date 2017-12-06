@@ -48,7 +48,6 @@ rule targets:
             [c.targets['featurecounts_agg']] +
             [c.targets['featurecounts_intergenic_agg']] +
             utils.flatten(c.targets['intergenic']) +
-            utils.flatten(c.targets['dupradar']) +
             utils.flatten(c.targets['featurecounts']) +
             utils.flatten(c.targets['featurecounts_intergenic']) +
             utils.flatten(c.targets['adjustedcounts']) +
