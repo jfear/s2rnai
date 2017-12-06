@@ -320,7 +320,7 @@ def _adjustcounts_odir(wildcards):
 
 def _adjustcounts_bam(wildcards):
     rows = c.sampletable[(c.sampletable.samplename == wildcards.sample) | (c.sampletable.target_symbol == 'LacZ')].copy()
-    return expand(c.patterns['bam'], zip, sample=rows.to_dict('list')['samplename'], sample_dir=c.sample_dir)
+    return expand(c.patterns['bam'], sample=rows.to_dict('list')['samplename'], sample_dir=[c.sample_dir])
 
 
 rule adjustedcounts:
@@ -340,7 +340,9 @@ rule adjustedcounts:
         '../bin/drsc_adjust_count.py '
         '--SRR {wildcards.sample} '
         '--BAM {input.bam} '
-        '--out {params.odir}'
+        '--out {params.odir} '
+        '--config config/config.yaml '
+        '--sampletable config/sampletable.tsv'
 
 
 rule rrna_libsizes_table:
