@@ -309,6 +309,7 @@ rule featurecounts_intergenic:
         '-o {output.counts} '
         '-s 2 '
         '-J '
+        '-t gene '
         '{input.bam} '
         '&> {log}'
 
