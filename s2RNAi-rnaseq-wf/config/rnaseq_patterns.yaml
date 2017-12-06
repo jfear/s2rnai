@@ -9,7 +9,7 @@ featurecounts_intergenic_agg: '{agg_dir}/featurecounts.intergenic.txt'
 
 adjustedcounts:
   counts: '{sample_dir}/{sample}/{sample}.cutadapt.bam.drsc.counts'
-  reads: '{sample_dir}/{sample}/{sample}.cutadapt.bam.drsc.fq'
+  reads: '{sample_dir}/{sample}/{sample}.cutadapt.bam.drsc.reads.fq'
 
 ###
 fastq: '{sample_dir}/{sample}/{sample}_R1.fastq.gz'
