@@ -47,11 +47,11 @@ def arguments():
     parser.add_argument("--out", dest="odir", action='store', required=True,
                         help="The output direcotry.")
 
-    parser.add_argument("--config", dest="config", action='store', required=False, default='../config/config.yml',
-                        help="lcdb-wf styled config. [default=../config/config.yml]")
+    parser.add_argument("--config", dest="config", action='store', required=False, default='config/config.yaml',
+                        help="lcdb-wf styled config. [default=config/config.yaml]")
 
-    parser.add_argument("--sampletable", dest="stable", action='store', required=False, default='../config/sampletable.tsv',
-                        help="lcdb-wf styled sampletable. [default=../config/sampletable.tsv]")
+    parser.add_argument("--sampletable", dest="stable", action='store', required=False, default='config/sampletable.tsv',
+                        help="lcdb-wf styled sampletable. [default=config/sampletable.tsv]")
 
     parser.add_argument("--drsc_coords", dest="coords", action='store', required=False, default='../output/drsc_coordinates.bed',
                         help="A BED file with DRSC coordinates. [default=../output/drsc_coordinates.bed]")

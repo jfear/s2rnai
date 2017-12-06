@@ -33,3 +33,9 @@ bigwig_pos:
 
 adjustedcounts:
   prefix: "--mem=8g --time=12:00:00"
+
+featurecounts_agg:
+  prefix: "--mem=10g --time=12:00:00"
+
+featurecounts_intergenic_agg:
+  prefix: "--mem=10g --time=12:00:00"
