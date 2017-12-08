@@ -1,5 +1,43 @@
-samplename	group	orig_filename
-sample1	control	data/example_data/rnaseq_sample1.fq.gz
-sample2	control	data/example_data/rnaseq_sample2.fq.gz
-sample3	treatment	data/example_data/rnaseq_sample3.fq.gz
-sample4	treatment	data/example_data/rnaseq_sample4.fq.gz
+# Samplenames with the same "label" will be considered technical replicates
+samplename	antibody	biological_material	replicate	label	orig_filename
+#input_1	input	wingdisc-1	1	input-wingdisc-1	data/example_data/chipseq_input1.fq.gz
+#input_2	input	wingdisc-2	2	input-wingdisc-2	data/example_data/chipseq_input2.fq.gz
+#ip_1	gaf	wingdisc-1	1	gaf-wingdisc-1	data/example_data/chipseq_ip1.fq.gz
+#ip_2	gaf	wingdisc-2	2	gaf-wingdisc-2	data/example_data/chipseq_ip2.fq.gz
+#ip_1	CP190	s2cell	1	CP190-WT1	data/sra_test_data/SRR1041448_1.fastq
+#input_1	input	s2cell	1	CP190-input	data/sra_test_data/SRR1041450_1.fastq
+#SRR833688	anti-Yki	s2cell	1	anti-Yki-1	data/sra_test_data/SRR833688_R1.fastq.gz
+#SRR833687	anti-Yki	s2cell	2	anti-Yki-2	data/sra_test_data/SRR833687_R1.fastq.gz
+#SRR833686	input	s2cell	1	input-1	data/sra_test_data/SRR833686_R1.fastq.gz
+#SRR034720	CTCF	s2cell	1	CTCF-1	data/sra_test_data/SRR034720_R1.fastq.gz
+#SRR034721	CTCF	s2cell	1	CTCF-1	data/sra_test_data/SRR034721_R1.fastq.gz
+#SRR034722	input	s2cell	1	input-1	data/sra_test_data/SRR034722_R1.fastq.gz
+#SRR034723	CTCF	s2cell	1	CTCF-2	data/sra_test_data/SRR034723_R1.fastq.gz
+#SRR034724	CTCF	s2cell	1	CTCF-2	data/sra_test_data/SRR034724_R1.fastq.gz
+#SRR034725	input	s2cell	1	input-2	data/sra_test_data/SRR034725_R1.fastq.gz
+#SRR121517	input	s2cell	1	input-s1	/home/bergeric/data/s2rnai/output/modENCODE_FQ/SRR121517_R1.fastq.gz
+#SRR121518	input	s2cell	1	input-s2	/home/bergeric/data/s2rnai/output/modENCODE_FQ/SRR121518_R1.fastq.gz
+#SRR121519	input	s2cell	1	input-s3	/home/bergeric/data/s2rnai/output/modENCODE_FQ/SRR121519_R1.fastq.gz
+#SRR121520	input	s2cell	1	input-s4	/home/bergeric/data/s2rnai/output/modENCODE_FQ/SRR121520_R1.fastq.gz
+#SRR121521	input	s2cell	1	input-s5	/home/bergeric/data/s2rnai/output/modENCODE_FQ/SRR121521_R1.fastq.gz
+#SRR121522	input	s2cell	1	input-s6	/home/bergeric/data/s2rnai/output/modENCODE_FQ/SRR121522_R1.fastq.gz
+SRR121523	input	s2cell	1	input-s7	/home/bergeric/data/s2rnai/output/modENCODE_FQ/SRR121523_R1.fastq.gz
+#SRR121524_1	input	s2cell	1	input-p1a	/home/bergeric/data/s2rnai/output/modENCODE_FQ/SRR121524_R1.fastq.gz
+#SRR121524_2	input	s2cell	1	input-p1a	/home/bergeric/data/s2rnai/output/modENCODE_FQ/SRR121524_R2.fastq.gz
+#SRR121525	H3K36me3	s2cell	1	s1	/home/bergeric/data/s2rnai/output/modENCODE_FQ/SRR121525_R1.fastq.gz
+#SRR121526	H3K36me3	s2cell	1	s2	/home/bergeric/data/s2rnai/output/modENCODE_FQ/SRR121526_R1.fastq.gz
+#SRR121527	H3K36me3	s2cell	1	s3	/home/bergeric/data/s2rnai/output/modENCODE_FQ/SRR121527_R1.fastq.gz
+#SRR121528	H3K36me3	s2cell	1	s4	/home/bergeric/data/s2rnai/output/modENCODE_FQ/SRR121528_R1.fastq.gz
+#SRR121529	H3K36me3	s2cell	1	s5	/home/bergeric/data/s2rnai/output/modENCODE_FQ/SRR121529_R1.fastq.gz
+#SRR121530	H3K36me3	s2cell	1	s6	/home/bergeric/data/s2rnai/output/modENCODE_FQ/SRR121530_R1.fastq.gz
+SRR121531	H3K36me3	s2cell	1	s7	/home/bergeric/data/s2rnai/output/modENCODE_FQ/SRR121531_R1.fastq.gz
+#SRR121532_1	H3K36me3	s2cell	1	p1a	/home/bergeric/data/s2rnai/output/modENCODE_FQ/SRR121532_R1.fastq.gz
+#SRR121532_2	H3K36me3	s2cell	1	p1a	/home/bergeric/data/s2rnai/output/modENCODE_FQ/SRR121532_R2.fastq.gz
+SRR869705	input	s2cell	1	input-rep1	/data/MiegNCBI/ncbi_remap/prealn-wf/output/samples/SRX287562/SRR869705/SRR869705_1.fastq.gz
+SRR869706	input	s2cell	2	input-rep2	/data/MiegNCBI/ncbi_remap/prealn-wf/output/samples/SRX287563/SRR869706/SRR869706_1.fastq.gz
+SRR869707	H3K9me2	s2cell	1	chip-rep1	/data/MiegNCBI/ncbi_remap/prealn-wf/output/samples/SRX287564/SRR869707/SRR869707_1.fastq.gz
+SRR869708	H3K9me2	s2cell	2	chip-rep2	/data/MiegNCBI/ncbi_remap/prealn-wf/output/samples/SRX287565/SRR869708/SRR869708_1.fastq.gz
+#Note here we are treating ip_3 and ip_4 as technical replicates for the sake of testing
+#ip_3	gaf	embryo-1	1	gaf-embryo-1	data/example_data/chipseq_ip3.fq.gz
+#ip_4	gaf	embryo-1	1	gaf-embryo-1	data/example_data/chipseq_ip4.fq.gz
+#input_3	input	embryo-1	1	input-embryo-1	data/example_data/chipseq_input3.fq.gz
