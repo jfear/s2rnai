@@ -8,11 +8,6 @@ import tarfile
 
 import pandas as pd
 
-from lcdblib.snakemake import helpers
-from lcdblib.utils import utils
-
-sys.path.insert(0, '../lcdb-wf')
-from lib import common
 
 sys.path.insert(0, '../lib/python')
 from s2rnai import meme

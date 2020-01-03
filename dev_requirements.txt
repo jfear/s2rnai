@@ -1,5 +1,0 @@
-jedi
-joblib
-nb_conda
-watchdog
-ipdb
