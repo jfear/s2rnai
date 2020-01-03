@@ -1,6 +1,5 @@
 import unittest
 import sys
-sys.path.insert(0, 'lib/python')
 from s2rnai import meme
 
 MOTIF="""MOTIF FBgn0000014 AbdA_Cell
