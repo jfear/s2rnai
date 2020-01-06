@@ -1,0 +1,63 @@
+# ** snakemake ** #
+"""The motif workflow."""
+import os
+import pandas as pd
+
+configfile: "../config/common.yaml"
+ASSEMBLY = config["assembly"]
+TAG = config["tag"]
+
+DATABASES = ['OnTheFly_2014_Drosophila', 'fly_factor_survey', 'flyreg.v2', 'dmmpmm2009', 'idmmpmm2009',]
+
+localrules: all, download_meme, otf2fbgn
+
+rule all:
+    input: 
+        expand("../output/motif-wf/{db_name}.meme", db_name=DATABASES), 
+        "../output/motif-wf/onTheFlyMap.tsv",
+        expand("../output/motif-wf/{db_name}/fimo.gff", db_name=DATABASES)
+
+
+rule download_meme:
+    """Download the current set of meme databases and pull out the FlyOnes"""
+    output: 
+        onTheFly='../output/motif-wf/OnTheFly_2014_Drosophila.meme',
+        flyFactor='../output/motif-wf/fly_factor_survey.meme',
+        flyReg='../output/motif-wf/flyreg.v2.meme',
+        dmmpmm2009='../output/motif-wf/dmmpmm2009.meme',
+        idmmpmm2009='../output/motif-wf/idmmpmm2009.meme',
+    params: url='http://meme-suite.org/meme-software/Databases/motifs/motif_databases.12.19.tgz'
+    script: "scripts/download_meme.py"
+
+
+rule otf2fbgn:
+    """Convert onTheFly ids to FBgn.
+    Uses webscraping to map otf to FBgn.
+    """
+    input: rules.download_meme.output.onTheFly
+    output: "../output/motif-wf/onTheFlyMap.tsv"
+    script: "scripts/otf2fbgn.py"
+
+
+rule fimo:
+    """Run Find Individual Motif Occurrences from the Meme Suite.
+
+    website: http://meme-suite.org/doc/fimo.html
+    citation: Charles E. Grant, Timothy L. Bailey, and William Stafford
+    Noble, "FIMO: Scanning for occurrences of a given motif", Bioinformatics,
+    27(7):1017-1018, 2011.
+    """
+    input:
+        reference=f"../lcdb-references/{ASSEMBLY}/{TAG}/fasta/{ASSEMBLY}_{TAG}.fasta",
+        database="../output/motif-wf/{db_name}.meme"
+    output:
+        xml="../output/motif-wf/{db_name}/fimo.xml",
+        html="../output/motif-wf/{db_name}/fimo.html",
+        txt="../output/motif-wf/{db_name}/fimo.tsv",
+        gff="../output/motif-wf/{db_name}/fimo.gff",
+    log: "../output/motif-wf/{db_name}/fimo.log"
+    resources:
+        mem_gb=lambda wildcards, attempt: attempt * 12,
+        time_hr=lambda wildcards, attempt: attempt * 24
+    conda: "../envs/meme.yaml"
+    shell: "fimo --oc $(dirname {output[0]}) {input.database} {input.reference} > {log} 2>&1"

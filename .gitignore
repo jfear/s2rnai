@@ -1,12 +1,15 @@
 *.DS_Store
 *.ipynb_checkpoints
+*.egg-info
 notebook/*/*.html
 data
 __pycache__
 cachedir
 output
+lcdb-references
 *slurm_logs
 *.snakemake
 *.log
 slurm-*
 references
+.vscode
