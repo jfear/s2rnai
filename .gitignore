@@ -12,3 +12,4 @@ lcdb-references
 *.log
 slurm-*
 references
+.vscode

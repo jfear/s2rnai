@@ -1,0 +1,7 @@
+name: meme
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - meme=5.1.0
