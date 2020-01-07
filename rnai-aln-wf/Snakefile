@@ -90,6 +90,9 @@ if 'Run' in c.sampletable.columns and sum(c.sampletable['Run'].str.startswith('S
     rule fastq_dump:
         output:
             fastq=render_r1_r2(c.patterns['fastq'])
+        resources:
+            mem_gb=lambda wildcards, attempt: attempt * 4,
+            time_hr=lambda wildcards, attempt: attempt * 4,
         run:
             srr = _st.loc[wildcards.sample, 'Run']
 
