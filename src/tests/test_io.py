@@ -6,9 +6,9 @@ GTF_ROW = '3R\tFlyBase\tgene\t7924323\t7967408\t.\t-\t.\tgene_id "FBgn0000504"; 
 
 def test_GffRow_gff():
     gff = GffRow(GFF_ROW)
-    assert gff.parse_attributes["Name"] == "dsx"
+    assert gff.parsed_attributes["Name"] == "dsx"
 
 
 def test_GffRow_gtf():
     gtf = GffRow(GTF_ROW)
-    assert gtf.parse_attributes["gene_symbol"] == "dsx"
+    assert gtf.parsed_attributes["gene_symbol"] == "dsx"
