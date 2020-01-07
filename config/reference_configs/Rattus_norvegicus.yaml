@@ -1,6 +1,6 @@
 references:
   rat:
-    ucsc_rn6:
+    rn6:
 
       metadata:
         reference_genome_build: 'rn6'
@@ -19,7 +19,7 @@ references:
           - 'refflat'
 
 
-    ucsc_rn6_transcriptome:
+    rn6_transcriptome:
       fasta:
         url: 'ftp://hgdownload.soe.ucsc.edu/goldenPath/rn6/bigZips/mrna.fa.gz'
         indexes:

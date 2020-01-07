@@ -52,7 +52,7 @@ fastq_screen:
     tag: gencode_m18
   - label: Rat
     organism: rat
-    tag: ucsc_rn6
+    tag: rn6
 
 
 # See the reference config files in the top level of the repo,
