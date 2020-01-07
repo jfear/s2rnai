@@ -1,4 +1,4 @@
-sampletable: 'config/test_sampletable.tsv'
+sampletable: 'config/sampletable.tsv'
 
 patterns: 'config/rnaseq_patterns.yaml'
 
