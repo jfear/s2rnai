@@ -1,0 +1,53 @@
+fastq: '../output/rnai-aln-wf/rnaseq_samples/{sample}/{sample}_R{n}.fastq.gz'
+cutadapt: '../output/rnai-aln-wf/rnaseq_samples/{sample}/{sample}_R{n}.cutadapt.fastq.gz'
+bam: '../output/rnai-aln-wf/rnaseq_samples/{sample}/{sample}.cutadapt.bam'
+fastqc:
+  raw: '../output/rnai-aln-wf/rnaseq_samples/{sample}/fastqc/{sample}_R1.fastq.gz_fastqc.zip'
+  cutadapt: '../output/rnai-aln-wf/rnaseq_samples/{sample}/fastqc/{sample}_R1.cutadapt.fastq.gz_fastqc.zip'
+  bam: '../output/rnai-aln-wf/rnaseq_samples/{sample}/fastqc/{sample}.cutadapt.bam_fastqc.zip'
+libsizes:
+  fastq:   '../output/rnai-aln-wf/rnaseq_samples/{sample}/{sample}_R1.fastq.gz.libsize'
+  cutadapt: '../output/rnai-aln-wf/rnaseq_samples/{sample}/{sample}_R1.cutadapt.fastq.gz.libsize'
+  bam:     '../output/rnai-aln-wf/rnaseq_samples/{sample}/{sample}.cutadapt.bam.libsize'
+fastq_screen: '../output/rnai-aln-wf/rnaseq_samples/{sample}/{sample}.cutadapt.screen.txt'
+featurecounts: '../output/rnai-aln-wf/rnaseq_aggregation/featurecounts.txt'
+libsizes_table: '../output/rnai-aln-wf/rnaseq_aggregation/libsizes_table.tsv'
+libsizes_yaml: '../output/rnai-aln-wf/rnaseq_aggregation/libsizes_table_mqc.yaml'
+rrna_percentages_table: '../output/rnai-aln-wf/rnaseq_aggregation/rrna_percentages_table.tsv'
+rrna_percentages_yaml: '../output/rnai-aln-wf/rnaseq_aggregation/rrna_percentages_table_mqc.yaml'
+rrna:
+   bam: '../output/rnai-aln-wf/rnaseq_samples/{sample}/rRNA/{sample}.cutadapt.rrna.bam'
+   libsize: '../output/rnai-aln-wf/rnaseq_samples/{sample}/rRNA/{sample}.cutadapt.rrna.bam.libsize'
+multiqc: '../output/rnai-aln-wf/rnaseq_aggregation/multiqc.html'
+markduplicates:
+   bam: '../output/rnai-aln-wf/rnaseq_samples/{sample}/{sample}.cutadapt.markdups.bam'
+   metrics: '../output/rnai-aln-wf/rnaseq_samples/{sample}/{sample}.cutadapt.markdups.bam.metrics'
+collectrnaseqmetrics:
+   metrics: '../output/rnai-aln-wf/rnaseq_samples/{sample}/{sample}.collectrnaseqmetrics.metrics'
+   pdf: '../output/rnai-aln-wf/rnaseq_samples/{sample}/{sample}.collectrnaseqmetrics.pdf'
+dupradar:
+   density_scatter: '../output/rnai-aln-wf/rnaseq_samples/{sample}/dupradar/{sample}_density_scatter.png'
+   expression_histogram: '../output/rnai-aln-wf/rnaseq_samples/{sample}/dupradar/{sample}_expression_histogram.png'
+   expression_boxplot: '../output/rnai-aln-wf/rnaseq_samples/{sample}/dupradar/{sample}_expression_boxplot.png'
+   expression_barplot: '../output/rnai-aln-wf/rnaseq_samples/{sample}/dupradar/{sample}_expression_barplot.png'
+   multimapping_histogram: '../output/rnai-aln-wf/rnaseq_samples/{sample}/dupradar/{sample}_multimapping_histogram.png'
+   dataframe: '../output/rnai-aln-wf/rnaseq_samples/{sample}/dupradar/{sample}_dataframe.tsv'
+   model: '../output/rnai-aln-wf/rnaseq_samples/{sample}/dupradar/{sample}_model.txt'
+   curve: '../output/rnai-aln-wf/rnaseq_samples/{sample}/dupradar/{sample}_curve.txt'
+preseq: '../output/rnai-aln-wf/rnaseq_samples/{sample}/{sample}_preseq_c_curve.txt'
+rseqc:
+   bam_stat: '../output/rnai-aln-wf/rnaseq_samples/{sample}/rseqc/{sample}_bam_stat.txt'
+  #  infer_experiment: '../output/rnai-aln-wf/rnaseq_samples/{sample}/rseqc/{sample}_infer_experiment.txt'
+bigwig:
+   pos: '../output/rnai-aln-wf/rnaseq_samples/{sample}/{sample}.cutadapt.bam.pos.bigwig'
+   neg: '../output/rnai-aln-wf/rnaseq_samples/{sample}/{sample}.cutadapt.bam.neg.bigwig'
+downstream:
+   rnaseq: 'downstream/rnaseq.html'
+patterns_by_aggregate:
+  merged_bigwig: '../output/rnai-aln-wf/rnaseq_aggregation/merged_bigwigs/{merged_bigwig_label}.bigwig'
+
+# Custom Files
+intergenic:
+  bed: "../output/intergenic_regions.bed"
+  gtf: "../output/intergenic_regions.gtf"
+featurecounts_intergenic: '../output/rnai-aln-wf/rnaseq_aggregation/featurecounts_intergenic.txt'
