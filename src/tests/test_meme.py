@@ -31,11 +31,3 @@ class testMeme(unittest.TestCase):
         self.assertEqual(0.833333, tf.matrix[-1, 0])
         self.assertEqual(0.333333, tf.matrix[-2, 2])
 
-    def test_memeParse(self):
-        tfs = meme.memeFile('data/external/meme/motif_databases/FLY/fly_factor_survey.meme')
-        self.assertEqual(4, tfs.meme_version)
-        self.assertEqual('ACGT', tfs.meme_alphabet)
-        self.assertEqual('+ -', tfs.meme_strands)
-        self.assertDictEqual({'A': 0.25, 'T': 0.25, 'C': 0.25, 'G': 0.25}, tfs.meme_bg)
-        self.assertEqual('AbdA_Cell', tfs['FBgn0000014'][0].name)
-
