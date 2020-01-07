@@ -64,7 +64,7 @@ class memeFile(object):
 
 
 
-MEMETFREGEX="""MOTIF (?P<id>[A-Za-z]+\d+\.*\d*_*\d*) (?P<name>.*?)
+MEMETFREGEX=r"""MOTIF (?P<id>[A-Za-z]+\d+\.*\d*_*\d*) (?P<name>.*?)
 
 letter-probability matrix: alength= (?P<alength>\d+) w= (?P<w>\d+) nsites= (?P<nsites>\d+) E= (?P<e>\d+)
 (?P<matrix>.*?)
