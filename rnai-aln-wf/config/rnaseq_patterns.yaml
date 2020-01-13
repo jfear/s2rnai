@@ -47,7 +47,9 @@ patterns_by_aggregate:
   merged_bigwig: '../output/rnai-aln-wf/rnaseq_aggregation/merged_bigwigs/{merged_bigwig_label}.bigwig'
 
 # Custom Files
+agg_featurecounts: '../output/rnai-aln-wf/rnaseq_aggregation/featurecounts.tsv'
 intergenic:
   bed: "../output/intergenic_regions.bed"
   gtf: "../output/intergenic_regions.gtf"
 featurecounts_intergenic: '../output/rnai-aln-wf/rnaseq_samples/{sample}/{sample}.featurecounts_intergenic.txt'
+agg_featurecounts_intergenic: '../output/rnai-aln-wf/rnaseq_aggregation/featurecounts_intergenic.tsv'
