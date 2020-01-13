@@ -53,3 +53,5 @@ intergenic:
   gtf: "../output/intergenic_regions.gtf"
 featurecounts_intergenic: '../output/rnai-aln-wf/rnaseq_samples/{sample}/{sample}.featurecounts_intergenic.txt'
 agg_featurecounts_intergenic: '../output/rnai-aln-wf/rnaseq_aggregation/featurecounts_intergenic.tsv'
+
+drsc_bed: "../output/drsc.bed"

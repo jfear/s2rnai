@@ -34,6 +34,10 @@ config = common.load_config(config)
 
 c = RNASeqConfig(config, config.get('patterns', 'config/rnaseq_patterns.yaml'))
 
+project_config = common.load_config("../config/common.yaml")
+RELEASE = project_config['release_date']
+TAG = project_config['tag']
+
 wildcard_constraints:
     n = '[1,2]'
 
@@ -44,7 +48,6 @@ def wrapper_for(path):
 # ----------------------------------------------------------------------------
 # RULES
 # ----------------------------------------------------------------------------
-
 
 # See "patterns and targets" in the documentation for what's going on here.
 final_targets = utils.flatten((
@@ -67,6 +70,7 @@ final_targets = utils.flatten((
     [c.targets["agg_featurecounts"]],
     c.targets['featurecounts_intergenic'],
     [c.targets["agg_featurecounts_intergenic"]],
+    c.patterns["drsc_bed"]
 ))
 
 
@@ -792,8 +796,15 @@ rule aggregate_featurecounts_intergenic:
         time_hr=lambda wildcards, attempt: attempt * 2
     script: "scripts/aggregate_featurecounts.py"
 
-
-
+rule make_drsc_bed:
+    input: "config/sampletable.tsv"
+    output: c.patterns["drsc_bed"]
+    params:
+        url=f"ftp://ftp.flybase.net/releases/FB{RELEASE}/dmel_{TAG.replace('-', '.')}/gff/dmel-all-no-analysis-{TAG.replace('-', '.')}.gff.gz"
+    resources:
+        mem_gb=lambda wildcards, attempt: attempt * 12,
+        time_hr=lambda wildcards, attempt: attempt * 2
+    script: "scripts/make_drsc_bed.py"
 # def _adjustcounts_odir(wildcards):
 #     return os.path.dirname(expand(c.patterns['adjustedcounts']['counts'], **wildcards)[0])
 
