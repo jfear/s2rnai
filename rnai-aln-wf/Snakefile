@@ -55,7 +55,7 @@ final_targets = utils.flatten((
     [c.targets['libsizes_table']],
     [c.targets['rrna_percentages_table']],
     [c.targets['multiqc']],
-    utils.flatten(c.targets['featurecounts']),
+    c.targets['featurecounts'],
     utils.flatten(c.targets['rrna']),
     utils.flatten(c.targets['markduplicates']),
     utils.flatten(c.targets['dupradar']),
@@ -64,7 +64,9 @@ final_targets = utils.flatten((
     utils.flatten(c.targets['collectrnaseqmetrics']),
     utils.flatten(c.targets['bigwig']),
     # Custom Files
-    [c.targets['featurecounts_intergenic']]
+    [c.targets["agg_featurecounts"]],
+    c.targets['featurecounts_intergenic'],
+    [c.targets["agg_featurecounts_intergenic"]],
 ))
 
 
@@ -348,11 +350,10 @@ rule featurecounts:
     """
     input:
         annotation=c.refdict[c.organism][config['gtf']['tag']]['gtf'],
-        bam=c.targets['bam']
+        bam=c.patterns["bam"]
     output:
-        counts='{sample_dir}/rnaseq_aggregation/featurecounts.txt'
-    log:
-        '{sample_dir}/rnaseq_aggregation/featurecounts.txt.log'
+        counts=c.patterns["featurecounts"]
+    log: c.patterns["featurecounts"] + ".log"
     resources:
         mem_gb=lambda wildcards, attempt: attempt * 2,
         time_hr=lambda wildcards, attempt: attempt * 2,
@@ -376,6 +377,14 @@ rule featurecounts:
             '{input.bam} '
             '&> {log}'
         )
+
+rule aggregate_featurecounts:
+    input: utils.flatten(c.targets["featurecounts"])
+    output: c.targets["agg_featurecounts"]
+    resources:
+        mem_gb=lambda wildcards, attempt: attempt * 2,
+        time_hr=lambda wildcards, attempt: attempt * 2
+    script: "scripts/aggregate_featurecounts.py"
 
 
 rule rrna_libsizes_table:
@@ -754,11 +763,10 @@ rule featurecounts_intergenic:
     """
     input:
         annotation=rules.intergenic.output.gtf,
-        bam=c.targets['bam']
+        bam=c.patterns['bam']
     output:
-        counts='{sample_dir}/rnaseq_aggregation/featurecounts_intergenic.txt'
-    log:
-        '{sample_dir}/rnaseq_aggregation/featurecounts_intergenic.txt.log'
+        counts=c.patterns["featurecounts_intergenic"]
+    log: c.patterns["featurecounts_intergenic"] + ".log"
     resources:
         mem_gb=lambda wildcards, attempt: attempt * 2,
         time_hr=lambda wildcards, attempt: attempt * 2,
@@ -774,6 +782,16 @@ rule featurecounts_intergenic:
             '{input.bam} '
             '&> {log}'
         )
+
+
+rule aggregate_featurecounts_intergenic:
+    input: utils.flatten(c.targets["featurecounts_intergenic"])
+    output: c.targets["agg_featurecounts_intergenic"]
+    resources:
+        mem_gb=lambda wildcards, attempt: attempt * 2,
+        time_hr=lambda wildcards, attempt: attempt * 2
+    script: "scripts/aggregate_featurecounts.py"
+
 
 
 # def _adjustcounts_odir(wildcards):
