@@ -348,11 +348,10 @@ rule featurecounts:
     """
     input:
         annotation=c.refdict[c.organism][config['gtf']['tag']]['gtf'],
-        bam=c.targets['bam']
+        bam=c.patterns["bam"]
     output:
-        counts='{sample_dir}/rnaseq_aggregation/featurecounts.txt'
-    log:
-        '{sample_dir}/rnaseq_aggregation/featurecounts.txt.log'
+        counts=c.patterns["featurecounts"]
+    log: c.patterns["featurecounts"] + ".log"
     resources:
         mem_gb=lambda wildcards, attempt: attempt * 2,
         time_hr=lambda wildcards, attempt: attempt * 2,
@@ -754,11 +753,10 @@ rule featurecounts_intergenic:
     """
     input:
         annotation=rules.intergenic.output.gtf,
-        bam=c.targets['bam']
+        bam=c.patterns['bam']
     output:
-        counts='{sample_dir}/rnaseq_aggregation/featurecounts_intergenic.txt'
-    log:
-        '{sample_dir}/rnaseq_aggregation/featurecounts_intergenic.txt.log'
+        counts=c.patterns["featurecounts_intergenic"]
+    log: c.patterns["featurecounts_intergenic"] + ".log"
     resources:
         mem_gb=lambda wildcards, attempt: attempt * 2,
         time_hr=lambda wildcards, attempt: attempt * 2,
