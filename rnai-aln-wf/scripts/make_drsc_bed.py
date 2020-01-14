@@ -16,7 +16,7 @@ import os
 import urllib.request
 import tempfile
 from pathlib import Path
-from typing import Generator, Tuple, List
+from typing import Tuple, List
 from collections import namedtuple
 
 import pandas as pd
