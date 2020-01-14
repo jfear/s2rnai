@@ -48,6 +48,8 @@ patterns_by_aggregate:
 
 # Custom Files
 agg_featurecounts: '../output/rnai-aln-wf/rnaseq_aggregation/featurecounts.tsv'
+featurecounts_reagents: '../output/rnai-aln-wf/rnaseq_samples/{sample}/{sample}.featurecounts.drsc.txt'
+agg_featurecounts_reagents: '../output/rnai-aln-wf/rnaseq_aggregation/featurecounts.drsc.tsv'
 intergenic:
   bed: "../output/intergenic_regions.bed"
   gtf: "../output/intergenic_regions.gtf"
