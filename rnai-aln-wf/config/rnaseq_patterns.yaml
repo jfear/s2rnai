@@ -54,4 +54,9 @@ intergenic:
 featurecounts_intergenic: '../output/rnai-aln-wf/rnaseq_samples/{sample}/{sample}.featurecounts_intergenic.txt'
 agg_featurecounts_intergenic: '../output/rnai-aln-wf/rnaseq_aggregation/featurecounts_intergenic.tsv'
 
-drsc_bed: "../output/drsc.bed"
+drsc:
+  bed: "../output/drsc.bed"
+  counts: "../output/rnai-aln-wf/rnaseq_samples/{sample}/{sample}.drsc.counts.tsv"
+  fq: "../output/rnai-aln-wf/rnaseq_samples/{sample}/{sample}.drsc.reads.fq"
+
+drsc_counts_agg: "../output/rnai-aln-wf/rnaseq_aggregation/drsc_counts_agg.tsv"
