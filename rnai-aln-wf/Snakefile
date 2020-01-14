@@ -70,6 +70,8 @@ final_targets = utils.flatten((
     utils.flatten(c.targets['bigwig']),
     # Custom Files
     [c.targets["agg_featurecounts"]],
+    [c.targets["featurecounts_reagents"]],
+    [c.targets["agg_featurecounts_reagents"]],
     c.targets['featurecounts_intergenic'],
     [c.targets["agg_featurecounts_intergenic"]],
     [c.patterns["drsc"]["bed"]],
@@ -842,64 +844,37 @@ rule agg_count_drsc:
 # def _adjustcounts_odir(wildcards):
 #     return os.path.dirname(expand(c.patterns['adjustedcounts']['counts'], **wildcards)[0])
 
+rule featurecounts_reagents:
+    input:
+        annotation="../data/external/lee/DRSC_regents.gtf",
+        bam=c.patterns["bam"]
+    output:
+        counts=c.patterns["featurecounts_reagents"]
+    log: c.patterns["featurecounts_reagents"] + ".log"
+    resources:
+        mem_gb=lambda wildcards, attempt: attempt * 2,
+        time_hr=lambda wildcards, attempt: attempt * 2,
+    run:
+        shell(
+            'featureCounts '
+            '-s2 '
+            '-T {threads} '
+            '-a {input.annotation} '
+            '-o {output.counts} '
+            '-t exon '
+            '-g transcript_id '
+            '-f '
+            '-M '
+            '-O '
+            '{input.bam} '
+            '&> {log}'
+        )
 
-# def _adjustcounts_bam(wildcards):
-#     rows = c.sampletable[(c.sampletable.samplename == wildcards.sample) | (c.sampletable.target_symbol == 'LacZ')].copy()
-#     return expand(c.patterns['bam'], sample=rows.to_dict('list')['samplename'], sample_dir=[c.sample_dir])
+rule aggregate_featurecounts_reagents:
+    input: utils.flatten(c.targets["featurecounts_reagents"])
+    output: c.targets["agg_featurecounts_reagents"]
+    resources:
+        mem_gb=lambda wildcards, attempt: attempt * 2,
+        time_hr=lambda wildcards, attempt: attempt * 2
+    script: "scripts/aggregate_featurecounts.py"
 
-
-# rule adjustedcounts:
-#     """
-#     Count reads with and without the DRSC reagent region.
-#     """
-#     input:
-#         bam=_adjustcounts_bam
-#     output:
-#         counts=c.patterns['adjustedcounts']['counts'],
-#         reads=c.patterns['adjustedcounts']['reads'],
-#     log:
-#         c.patterns['adjustedcounts']['counts'] + '.log'
-#     params:
-#         odir=_adjustcounts_odir
-#     shell:
-#         '../bin/drsc_adjust_count.py '
-#         '--SRR {wildcards.sample} '
-#         '--BAM {input.bam} '
-#         '--out {params.odir} '
-#         '--config config/config.yaml '
-#         '--sampletable config/sampletable.tsv'
-
-
-# def parse_featureCounts_counts(sample, file):
-#     """Parser for subread feature counts."""
-#     df = pd.read_csv(file, sep='\t', comment='#')
-#     df.columns = ['FBgn', 'chr', 'start', 'end', 'strand', 'length', 'count']
-#     df['sample'] = sample
-#     df.set_index(['sample', 'FBgn'], inplace=True)
-#     return df['count']
-
-
-# rule featurecounts_agg:
-#     input: c.targets['featurecounts']
-#     output: c.patterns['featurecounts_agg']
-#     run:
-#         dfs = []
-#         for fn in input:
-#             name = os.path.basename(os.path.dirname(fn))
-#             dfs.append(parse_featureCounts_counts(name, fn))
-#         df = pd.concat(dfs)
-#         dfSBS = df.unstack(level=0)
-#         dfSBS.to_csv(str(output), sep='\t')
-
-
-# rule featurecounts_intergenic_agg:
-#     input: c.targets['featurecounts_intergenic']
-#     output: c.patterns['featurecounts_intergenic_agg']
-#     run:
-#         dfs = []
-#         for fn in input:
-#             name = os.path.basename(os.path.dirname(fn))
-#             dfs.append(parse_featureCounts_counts(name, fn))
-#         df = pd.concat(dfs)
-#         dfSBS = df.unstack(level=0)
-#         dfSBS.to_csv(str(output), sep='\t')
