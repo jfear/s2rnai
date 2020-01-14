@@ -34,6 +34,12 @@ config = common.load_config(config)
 
 c = RNASeqConfig(config, config.get('patterns', 'config/rnaseq_patterns.yaml'))
 
+project_config = common.load_config("../config/common.yaml")
+RELEASE = project_config['release_date']
+TAG = project_config['tag']
+
+NON_NA_SAMPLES = c.sampletable.query("drsc != 'DRSCNA'").samplename.unique()
+
 wildcard_constraints:
     n = '[1,2]'
 
@@ -44,7 +50,6 @@ def wrapper_for(path):
 # ----------------------------------------------------------------------------
 # RULES
 # ----------------------------------------------------------------------------
-
 
 # See "patterns and targets" in the documentation for what's going on here.
 final_targets = utils.flatten((
@@ -67,6 +72,8 @@ final_targets = utils.flatten((
     [c.targets["agg_featurecounts"]],
     c.targets['featurecounts_intergenic'],
     [c.targets["agg_featurecounts_intergenic"]],
+    [c.patterns["drsc"]["bed"]],
+    [c.patterns["drsc_counts_agg"]]
 ))
 
 
@@ -792,7 +799,45 @@ rule aggregate_featurecounts_intergenic:
         time_hr=lambda wildcards, attempt: attempt * 2
     script: "scripts/aggregate_featurecounts.py"
 
+rule make_drsc_bed:
+    input: "config/sampletable.tsv"
+    output: c.patterns["drsc"]["bed"]
+    params:
+        url=f"ftp://ftp.flybase.net/releases/FB{RELEASE}/dmel_{TAG.replace('-', '.')}/gff/dmel-all-no-analysis-{TAG.replace('-', '.')}.gff.gz"
+    resources:
+        mem_gb=lambda wildcards, attempt: attempt * 12,
+        time_hr=lambda wildcards, attempt: attempt * 2
+    script: "scripts/make_drsc_bed.py"
 
+
+rule count_drsc:
+    input:
+        bam=c.patterns["bam"],
+        drsc_bed=rules.make_drsc_bed.output[0],
+        gtf=c.refdict[c.organism][config['gtf']['tag']]['gtf'],
+    output: 
+        counts=c.patterns['drsc']['counts'],
+        fq=c.patterns['drsc']['fq'],
+    params: 
+        drsc=lambda wildcards: c.sampletable.query(f"samplename == '{wildcards.sample}'").squeeze().drsc,
+        fbgn=lambda wildcards: c.sampletable.query(f"samplename == '{wildcards.sample}'").squeeze().target_FBgn
+    resources:
+        mem_gb=lambda wildcards, attempt: attempt * 12,
+        time_hr=lambda wildcards, attempt: attempt * 2
+    script: "scripts/drsc_adjust_count.py"
+
+
+rule agg_count_drsc:
+    input: expand(c.patterns["drsc"]["counts"], sample=NON_NA_SAMPLES)
+    output: c.patterns["drsc_counts_agg"]
+    resources:
+        mem_gb=lambda wildcards, attempt: attempt * 2,
+        time_hr=lambda wildcards, attempt: attempt * 2
+    run:
+        pd.concat([
+            pd.read_table(file_name)
+            for file_name in input
+        ], sort=True).to_csv(output[0], sep="\t", index=False)
 
 # def _adjustcounts_odir(wildcards):
 #     return os.path.dirname(expand(c.patterns['adjustedcounts']['counts'], **wildcards)[0])

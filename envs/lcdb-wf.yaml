@@ -143,6 +143,7 @@ dependencies:
   - hdf5=1.10.5
   - hisat2=2.1.0
   - htslib=1.9
+  - htseq=0.11.2
   - humanfriendly=4.18
   - icu=58.2
   - idna=2.8
