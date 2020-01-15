@@ -13,8 +13,7 @@ localrules: all, download_meme, otf2fbgn
 
 rule all:
     input: 
-        "../output/motif-wf/onTheFlyMap.tsv",
-        expand("../output/motif-wf/{db_name}/fimo_gene_intersection.tsv", db_name=DATABASES)
+        "../output/motif-wf/fimo_score_matrix.tsv",
 
 
 rule download_meme:
@@ -61,6 +60,7 @@ rule fimo:
     conda: "../envs/meme.yaml"
     shell: "fimo --oc $(dirname {output[0]}) {input.database} {input.reference} > {log} 2>&1"
 
+
 rule fimo_intersect:
     input:
         motif=rules.fimo.output.txt,
@@ -68,3 +68,13 @@ rule fimo_intersect:
         chromsizes=f"../lcdb-references/{ASSEMBLY}/{TAG}/fasta/{ASSEMBLY}_{TAG}.chromsizes",
     output: "../output/motif-wf/{db_name}/fimo_gene_intersection.tsv"
     script: "scripts/fimo_intersect.py"
+
+
+rule aggregate_fimo_scores:
+    input:
+        files=expand("../output/motif-wf/{db_name}/fimo_gene_intersection.tsv", db_name=DATABASES),
+        annotation="../lcdb-references/dmel/r6-26/fb_annotation/dmel_r6-26.fb_annotation",
+        otf="../output/motif-wf/onTheFlyMap.tsv",
+        tfs="../data/external/FlyBase/transcription_factors.tsv",
+    output: "../output/motif-wf/fimo_score_matrix.tsv"
+    script: "scripts/aggregate_fimo_scores.py"
