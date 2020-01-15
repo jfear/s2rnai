@@ -13,9 +13,8 @@ localrules: all, download_meme, otf2fbgn
 
 rule all:
     input: 
-        expand("../output/motif-wf/{db_name}.meme", db_name=DATABASES), 
         "../output/motif-wf/onTheFlyMap.tsv",
-        expand("../output/motif-wf/{db_name}/fimo.gff", db_name=DATABASES)
+        expand("../output/motif-wf/{db_name}/fimo_gene_intersection.tsv", db_name=DATABASES)
 
 
 rule download_meme:
@@ -61,3 +60,11 @@ rule fimo:
         time_hr=lambda wildcards, attempt: attempt * 24
     conda: "../envs/meme.yaml"
     shell: "fimo --oc $(dirname {output[0]}) {input.database} {input.reference} > {log} 2>&1"
+
+rule fimo_intersect:
+    input:
+        motif=rules.fimo.output.txt,
+        db=f"../lcdb-references/{ASSEMBLY}/{TAG}/gtf/{ASSEMBLY}_{TAG}.gtf.db",
+        chromsizes=f"../lcdb-references/{ASSEMBLY}/{TAG}/fasta/{ASSEMBLY}_{TAG}.chromsizes",
+    output: "../output/motif-wf/{db_name}/fimo_gene_intersection.tsv"
+    script: "scripts/fimo_intersect.py"
