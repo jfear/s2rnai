@@ -48,7 +48,7 @@ def get_fimo_as_bed(file_name) -> pybedtools.BedTool:
 
 def wo_output_to_dataframe(data: pybedtools.BedTool) -> pd.DataFrame:
     return (
-        data.to_dataframe(header=None)
+        data.to_dataframe(disable_auto_names=True, header=None)
         .assign(chrom=lambda x: x[0])
         .assign(start=lambda x: x[1])
         .assign(stop=lambda x: x[2])
