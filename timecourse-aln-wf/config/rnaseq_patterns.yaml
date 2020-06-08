@@ -1,0 +1,64 @@
+fastq: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/{sample}_R{n}.fastq.gz'
+cutadapt: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/{sample}_R{n}.cutadapt.fastq.gz'
+bam: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/{sample}.cutadapt.bam'
+fastqc:
+  raw: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/fastqc/{sample}_R1.fastq.gz_fastqc.zip'
+  cutadapt: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/fastqc/{sample}_R1.cutadapt.fastq.gz_fastqc.zip'
+  bam: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/fastqc/{sample}.cutadapt.bam_fastqc.zip'
+libsizes:
+  fastq:   '../output/timecourse-aln-wf/rnaseq_samples/{sample}/{sample}_R1.fastq.gz.libsize'
+  cutadapt: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/{sample}_R1.cutadapt.fastq.gz.libsize'
+  bam:     '../output/timecourse-aln-wf/rnaseq_samples/{sample}/{sample}.cutadapt.bam.libsize'
+fastq_screen: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/{sample}.cutadapt.screen.txt'
+featurecounts: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/{sample}.featurecounts.txt'
+libsizes_table: '../output/timecourse-aln-wf/rnaseq_aggregation/libsizes_table.tsv'
+libsizes_yaml: '../output/timecourse-aln-wf/rnaseq_aggregation/libsizes_table_mqc.yaml'
+rrna_percentages_table: '../output/timecourse-aln-wf/rnaseq_aggregation/rrna_percentages_table.tsv'
+rrna_percentages_yaml: '../output/timecourse-aln-wf/rnaseq_aggregation/rrna_percentages_table_mqc.yaml'
+rrna:
+   bam: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/rRNA/{sample}.cutadapt.rrna.bam'
+   libsize: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/rRNA/{sample}.cutadapt.rrna.bam.libsize'
+multiqc: '../output/timecourse-aln-wf/rnaseq_aggregation/multiqc.html'
+markduplicates:
+   bam: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/{sample}.cutadapt.markdups.bam'
+   metrics: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/{sample}.cutadapt.markdups.bam.metrics'
+collectrnaseqmetrics:
+   metrics: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/{sample}.collectrnaseqmetrics.metrics'
+   pdf: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/{sample}.collectrnaseqmetrics.pdf'
+dupradar:
+   density_scatter: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/dupradar/{sample}_density_scatter.png'
+   expression_histogram: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/dupradar/{sample}_expression_histogram.png'
+   expression_boxplot: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/dupradar/{sample}_expression_boxplot.png'
+   expression_barplot: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/dupradar/{sample}_expression_barplot.png'
+   multimapping_histogram: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/dupradar/{sample}_multimapping_histogram.png'
+   dataframe: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/dupradar/{sample}_dataframe.tsv'
+   model: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/dupradar/{sample}_model.txt'
+   curve: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/dupradar/{sample}_curve.txt'
+preseq: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/{sample}_preseq_c_curve.txt'
+rseqc:
+   bam_stat: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/rseqc/{sample}_bam_stat.txt'
+  #  infer_experiment: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/rseqc/{sample}_infer_experiment.txt'
+bigwig:
+   pos: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/{sample}.cutadapt.bam.pos.bigwig'
+   neg: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/{sample}.cutadapt.bam.neg.bigwig'
+downstream:
+   rnaseq: 'downstream/rnaseq.html'
+patterns_by_aggregate:
+  merged_bigwig: '../output/timecourse-aln-wf/rnaseq_aggregation/merged_bigwigs/{merged_bigwig_label}.bigwig'
+
+# Custom Files
+agg_featurecounts: '../output/timecourse-aln-wf/rnaseq_aggregation/featurecounts.tsv'
+featurecounts_reagents: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/{sample}.featurecounts.drsc.txt'
+agg_featurecounts_reagents: '../output/timecourse-aln-wf/rnaseq_aggregation/featurecounts.drsc.tsv'
+intergenic:
+  bed: "../output/intergenic_regions.bed"
+  gtf: "../output/intergenic_regions.gtf"
+featurecounts_intergenic: '../output/timecourse-aln-wf/rnaseq_samples/{sample}/{sample}.featurecounts_intergenic.txt'
+agg_featurecounts_intergenic: '../output/timecourse-aln-wf/rnaseq_aggregation/featurecounts_intergenic.tsv'
+
+drsc:
+  bed: "../output/drsc.bed"
+  counts: "../output/timecourse-aln-wf/rnaseq_samples/{sample}/{sample}.drsc.counts.tsv"
+  fq: "../output/timecourse-aln-wf/rnaseq_samples/{sample}/{sample}.drsc.reads.fq"
+
+drsc_counts_agg: "../output/timecourse-aln-wf/rnaseq_aggregation/drsc_counts_agg.tsv"
