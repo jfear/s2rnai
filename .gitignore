@@ -13,3 +13,4 @@ lcdb-references
 slurm-*
 references
 .vscode
+.env
