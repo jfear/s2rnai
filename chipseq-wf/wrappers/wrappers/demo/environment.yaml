@@ -1,5 +1,0 @@
-channels:
-  - lcdb
-dependencies:
-  - python=3
-  - lcdblib ==0.1.2.post
