@@ -27,28 +27,49 @@ def wrangle_attrs(sr: pd.Series):
     return sr.map(pretty)
 
 
+def wrangle_pmid(sr: pd.Series):
+    def pretty(papers: dict):
+        return ";".join({str(paper["accn"]) for paper in papers})
+
+    return sr.map(pretty)
+
+
+def wrangle_citation(sr: pd.Series):
+    def pretty(papers: dict):
+        return ";".join({paper["citation"] for paper in papers})
+
+    return sr.map(pretty)
+
+
 client = MongoClient()
 db: Collection = client["sramongo"]["ncbi"]
 
-metadata = pd.DataFrame(
-    db.aggregate(
-        [
-            {"$unwind": {"path": "$runs"}},
-            {
-                "$project": {
-                    "_id": False,
-                    "SRX": "$srx",
-                    "SRR": "$runs.srr",
-                    "BioProject": "$BioProject.accn",
-                    "BioSample": "$BioSample.accn",
-                    "GEO": "$study.geo",
-                    "sample_title": "$sample.title",
-                    "sample_attributes": "$sample.attributes",
-                }
-            },
-        ]
+metadata = (
+    pd.DataFrame(
+        db.aggregate(
+            [
+                {"$unwind": {"path": "$runs"}},
+                {
+                    "$project": {
+                        "_id": False,
+                        "SRX": "$srx",
+                        "SRR": "$runs.srr",
+                        "BioProject": "$BioProject.accn",
+                        "BioSample": "$BioSample.accn",
+                        "GEO": "$study.geo",
+                        "sample_title": "$sample.title",
+                        "sample_attributes": "$sample.attributes",
+                        "PMID": "$papers",
+                        "citation": "$papers",
+                    }
+                },
+            ]
+        )
     )
-).assign(sample_attributes=lambda x: wrangle_attrs(x.sample_attributes))
+    .assign(sample_attributes=lambda x: wrangle_attrs(x.sample_attributes))
+    .assign(PMID=lambda x: wrangle_pmid(x.PMID))
+    .assign(citation=lambda x: wrangle_citation(x.citation))
+)
 
 client.close()
 
@@ -82,9 +103,11 @@ rnai = (
 
 # %%
 # S2 RNA-Seq from SRA
-rnaseq = pd.read_csv("../data/sra_s2_rnaseq.txt", header=None, names=["SRX"]).assign(
-    experiment="S2 RNA-Seq"
-).merge(metadata[["SRX", "SRR"]])
+rnaseq = (
+    pd.read_csv("../data/sra_s2_rnaseq.txt", header=None, names=["SRX"])
+    .assign(experiment="S2 RNA-Seq")
+    .merge(metadata[["SRX", "SRR"]])
+)
 
 
 # %%
@@ -101,12 +124,13 @@ chipseq = (
 stack = pd.concat([rnaseq, chipseq, rnai], ignore_index=True, sort=False).sort_values(
     ["SRX", "SRR"]
 )
-df = metadata.merge(stack).set_index(["SRX", "SRR", "BioProject", "BioSample", "GEO"])
+df = metadata.merge(stack).set_index(
+    ["SRX", "SRR", "BioProject", "BioSample", "GEO", "PMID", "citation"]
+)
 
 # %%
 
 df.to_csv("../output/notebook/sra_identifiers.tsv", sep="\t")
-
 
 
 # %%
